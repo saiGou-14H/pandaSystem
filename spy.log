@@ -1,0 +1,1 @@
+1731571592331|212|statement|connection 0|url jdbc:p6spy:mysql://47.236.166.34:3306/monitoringsystem?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC&allowMultiQueries=true&allowPublicKeyRetrieval=true|show table status WHERE 1=1  AND NAME IN ('test')|show table status WHERE 1=1  AND NAME IN ('test')
