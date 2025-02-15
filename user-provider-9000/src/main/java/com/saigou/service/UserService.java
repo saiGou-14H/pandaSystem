@@ -1,7 +1,7 @@
 package com.saigou.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.saigou.entity.user.User;
+import com.saigou.entity.User;
 
 
 import java.util.List;
@@ -17,10 +17,10 @@ import java.util.List;
  */
 public interface UserService extends IService<User> {
     int add(User user);
-    int delete(Integer id);
+    int delete(Long id);
     int update(User user);
 
-    User getById(Integer id);
+    User getById(Long id);
     List<User> getAll();
 
 }

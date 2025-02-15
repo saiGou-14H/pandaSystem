@@ -3,7 +3,7 @@ package com.saigou.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
-import com.saigou.entity.user.User;
+import com.saigou.entity.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 

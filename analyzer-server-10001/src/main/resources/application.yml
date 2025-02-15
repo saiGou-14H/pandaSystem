@@ -1,0 +1,25 @@
+server:
+  port: 10001
+spring:
+  application:
+    name: analyzer-server-10001
+  cloud:
+    nacos:
+      server-addr: scnu.saigou.work:8848
+      discovery:
+        group: pandaSystem
+custom:
+  info:
+    title: 熊猫
+    version: 1.0
+    description: 基于深度学习的课堂监控系统
+    contact: 基于深度学习的课堂监控系统
+    # 设置当前服务在网关中的代理路径
+    gateway-url: http://localhost:9999/${spring.application.name}
+  license:
+    name: ${spring.application.name}-api
+    terms-of-service: http://localhost:${server.port}/swagger-ui.html
+  security:
+    name: Authenticate
+    token-url: http://kwqqr48rgo.cdhttp.cn/oauth2/token
+    authorization-url: http://kwqqr48rgo.cdhttp.cn/oauth2/authorize
