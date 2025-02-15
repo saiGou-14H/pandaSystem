@@ -1,0 +1,34 @@
+package com.saigou.api.model.param;
+
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import java.io.Serializable;
+
+/**
+ * 关闭流请求参数
+ *
+ * @author lidaofu
+ * @since 2023/3/30
+ **/
+@Data
+@ApiModel(value = "CloseStreamsParam对象", description = "关闭流请求参数")
+public class CloseStreamsParam implements Serializable {
+
+    private static final long serialVersionUID = 1;
+
+    @ApiModelProperty(value = "app")
+    private String app;
+
+    @ApiModelProperty(value = "流id")
+    private String stream;
+
+    @ApiModelProperty(value = "是否强制关闭")
+    private Integer force=1;
+
+    @ApiModelProperty(value = "流的协议")
+    private String schema;
+
+
+}

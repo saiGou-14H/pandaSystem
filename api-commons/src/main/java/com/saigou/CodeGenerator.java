@@ -17,7 +17,8 @@ public class CodeGenerator {
         List<String> tables = new ArrayList<>();
         tables.add("user");
 
-        FastAutoGenerator.create("jdbc:p6spy:mysql://127.0.0.1:3306/oj?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC&allowMultiQueries=true&allowPublicKeyRetrieval=true","root","70852096")
+
+        FastAutoGenerator.create("jdbc:p6spy:mysql://scnu.saigou.work:3306/scnu?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC&allowMultiQueries=true&allowPublicKeyRetrieval=true","scnu","Qq70852096..")
                 .globalConfig(builder -> {
                     builder.author("saigou")               //作者
                             .outputDir(System.getProperty("user.dir")+"\\api-commons\\src\\main\\java")    //输出路径(写到java目录)

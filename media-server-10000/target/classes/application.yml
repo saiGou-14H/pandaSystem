@@ -1,0 +1,60 @@
+server:
+  port: 10000
+media: ##目前只增加部分重要配置，更多配置请自行配置
+  thread_num: 8
+  rtmp_port: 7935
+  rtsp_port: 7554
+  http_port: 7080
+  rtc_port: 8000
+  rtc_host: 127.0.0.1
+  auto_close: 0
+  streamNoneReaderDelayMS: 30000
+  maxStreamWaitMS: 1500
+  enable_ts: 1
+  enable_hls: 1
+  enable_fmp4: 0
+  enable_rtsp: 1
+  enable_rtmp: 1
+  enable_mp4: 0
+  enable_hls_fmp4: 1
+  enable_audio: 1
+  mp4_as_player: 1
+  mp4_max_second: 3600
+  mp4_save_path: E:/media
+  hls_save_path: E:/media
+  rootPath: E:/media
+  hls_demand: 0
+  broadcastRecordTs: 1
+  segDur: 3
+  segNum: 3
+  rtsp_demand: 0
+  rtmp_demand: 0
+  ts_demand: 1
+  fmp4_demand: 1
+  log_level: 2
+  log_mask: 1  #1console 2file 4fun
+  log_file_days: 1
+  log_path: E:/media
+spring:
+  application:
+    name: meida-server-10000
+  cloud:
+    nacos:
+      server-addr: scnu.saigou.work:8848
+      discovery:
+        group: pandaSystem
+custom:
+  info:
+    title: 熊猫
+    version: 1.0
+    description: 基于深度学习的课堂监控系统
+    contact: 基于深度学习的课堂监控系统
+    # 设置当前服务在网关中的代理路径
+    gateway-url: http://localhost:9999/${spring.application.name}
+  license:
+    name: ${spring.application.name}-api
+    terms-of-service: http://localhost:${server.port}/swagger-ui.html
+  security:
+    name: Authenticate
+    token-url: http://kwqqr48rgo.cdhttp.cn/oauth2/token
+    authorization-url: http://kwqqr48rgo.cdhttp.cn/oauth2/authorize

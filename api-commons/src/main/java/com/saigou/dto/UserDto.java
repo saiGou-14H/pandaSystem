@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
  * </p>
  *
  * @author saigou
- * @since 2024-04-19
+ * @since 2024-11-23
  */
 @Data
 @TableName("user")
@@ -25,44 +25,32 @@ public class UserDto implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId("id")
-    private Integer id;
 
-    @ApiModelProperty("雪花id")
-    @TableField("uuid")
-    private Integer uuid;
-
-    @ApiModelProperty("昵称")
-    @TableField("nickname")
-    private String nickname;
+    @ApiModelProperty("昵称/姓名")
+    @TableField("name")
+    private String name;
 
     @ApiModelProperty("邮箱")
-    @TableField("mail")
-    private String mail;
+    @TableField("email")
+    private String email;
 
     @ApiModelProperty("手机号")
     @TableField("phone")
     private String phone;
 
-    @ApiModelProperty("密码")
-    @TableField("password")
-    private String password;
+    @ApiModelProperty("账号/学号")
+    @TableField("account")
+    private String account;
 
-    @ApiModelProperty("登录IP地址")
-    @TableField("ip")
-    private String ip;
 
-    @ApiModelProperty("头像地址")
-    @TableField("head_url")
-    private String headUrl;
+    @ApiModelProperty("头像url")
+    @TableField("avatar")
+    private String avatar;
 
-    @ApiModelProperty("账号创建时间")
-    @TableField("create_data")
-    private LocalDateTime createData;
 
-    @ApiModelProperty("是否封禁（1封禁）")
-    @TableField("ban")
-    private Integer ban;
+    @ApiModelProperty("账号是否封禁")
+    @TableField("isban")
+    private Integer isban;
 
 
 }

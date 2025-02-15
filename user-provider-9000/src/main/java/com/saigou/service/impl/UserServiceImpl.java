@@ -1,8 +1,10 @@
 package com.saigou.service.impl;
 
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.saigou.entity.user.User;
+import com.saigou.entity.User;
 import com.saigou.mapper.UserMapper;
 import com.saigou.service.UserService;
 import jakarta.annotation.Resource;
@@ -28,7 +30,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public int delete(Integer id) {
+    public int delete(Long id) {
         return userMapper.deleteById(id);
     }
 
@@ -38,12 +40,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public User getById(Integer id) {
+    public User getById(Long id) {
         return userMapper.selectById(id);
     }
+
+
+
 
     @Override
     public List<User> getAll() {
         return userMapper.getAll();
+    }
+    public User getByAccount(String account) {
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        wrapper.eq("account",account);
+        return userMapper.selectOne(wrapper);
     }
 }

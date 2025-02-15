@@ -3,13 +3,38 @@ server:
 spring:
   application:
     name: gateway-9999
+
   cloud:
     nacos:
-      server-addr: 127.0.0.1:8848
+      server-addr: scnu.saigou.work:8848
+      discovery:
+        group: pandaSystem
     gateway:
+      discovery:
+        locator:
+          # 根据注册中心的服务自动生成路由
+          enabled: true
+          # 路由名转小写
+          lower-case-service-id: true
       routes:
-        - id: consumer-user-9001
-          uri: lb://consumer-user-9001
+        - id: user-consumer-9001
+          uri: lb://user-consumer-9001
           predicates:
-            - Path=/user/**
+            - Path=/auth/**,/user/**
+custom:
+  info:
+    title: 熊猫
+    version: 1.0
+    description: 基于深度学习的课堂监控系统
+    # 设置当前服务在网关中的代理路径
+    gateway-url: http://localhost:9999/${spring.application.name}
+  license:
+    name: ${spring.application.name}-api
+    terms-of-service: http://localhost:${server.port}/swagger-ui.html
+  security:
+    name: Authenticate
+    token-url: http://kwqqr48rgo.cdhttp.cn/oauth2/token
+    authorization-url: http://kwqqr48rgo.cdhttp.cn/oauth2/authorize
+
+
 

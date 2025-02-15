@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="api-commons" />
+        <module name="user-consumer-9001" />
+        <module name="user-provider-9000" />
+        <module name="media-server-10000" />
+        <module name="analyzer-server-10001" />
+        <module name="gateway-9999" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="media-server" target="17" />
+      <module name="VideoServer" target="1.7" />
+    </bytecodeTargetLevel>
+  </component>
+</project>
