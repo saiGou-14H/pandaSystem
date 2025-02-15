@@ -1,0 +1,51 @@
+package com.saigou.service.impl;
+
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.saigou.entity.Room;
+import com.saigou.mapper.RoomMapper;
+import com.saigou.service.RoomService;
+import io.swagger.v3.oas.annotations.servers.Server;
+import jakarta.annotation.Resource;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class RoomServiceImpl extends ServiceImpl<RoomMapper, Room> implements RoomService
+{
+    @Resource
+    private RoomMapper roomMapper;
+    @Override
+    public int add(Room room) {
+        return roomMapper.insert(room);
+    }
+
+    @Override
+    public int delete(Long id) {
+        return roomMapper.deleteById(id);
+    }
+
+    @Override
+    public int update(Room room) {
+        return roomMapper.updateById(room);
+    }
+
+    @Override
+    public Room getById(Long id) {
+        return roomMapper.selectById(id);
+    }
+
+    @Override
+    public Room getByRoomAddress(String roomAddress) {
+        QueryWrapper<Room> wrapper = new QueryWrapper<>();
+        wrapper.eq("address",roomAddress);
+        return roomMapper.selectOne(wrapper);
+    }
+
+    @Override
+    public List<Room> getAll() {
+        return roomMapper.getAll();
+    }
+}

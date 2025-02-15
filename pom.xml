@@ -15,6 +15,8 @@
         <module>gateway-9999</module>
         <module>media-server-10000</module>
         <module>analyzer-server-10001</module>
+        <module>room-consumer-9002</module>
+        <module>room-provider-9003</module>
     </modules>
 
     <properties>

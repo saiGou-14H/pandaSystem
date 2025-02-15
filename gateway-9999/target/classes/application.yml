@@ -21,6 +21,11 @@ spring:
           uri: lb://user-consumer-9001
           predicates:
             - Path=/auth/**,/user/**
+
+        - id: room-consumer-9002
+          uri: lb://room-consumer-9002
+          predicates:
+            - Path=/room/**
 custom:
   info:
     title: 熊猫

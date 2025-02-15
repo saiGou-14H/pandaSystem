@@ -32,9 +32,12 @@ public class AuthController {
             return ResponseVO.error(ResponseEnum.INCORRECT_CREDENTIALS);
         UserVo userVo = new UserVo();
         BeanUtils.copyProperties(auth,userVo);
-        userVo.setAccessToken(JwtUtil.getToken(auth.getId()));
+        userVo.setAccessToken(JwtUtil.getAccessToken(auth.getId()));
+        userVo.setRefreshToken(JwtUtil.getRefreshToken(auth.getId()));
+        System.out.println("准备连接redies");
         //Redis保存token
-        RedisUtil.set("user:"+auth.getId(),userVo.getAccessToken(),60*60*1);
+        RedisUtil.set("user:"+auth.getId(),userVo.getRefreshToken(),60*60*1);
+        System.out.println("连接redis成功");
         return ResponseVO.success(userVo);
     }
     @GetMapping("refresh")
@@ -42,9 +45,7 @@ public class AuthController {
     public ResponseVO refresh(HttpServletRequest request){
         Long userId = JwtUtil.getUserId(request);
         UserVo userVo = new UserVo();
-        userVo.setAccessToken(JwtUtil.getToken(userId));
-        //Redis更新token
-        RedisUtil.set("user:"+userId,userVo.getAccessToken(),60*60*1);
+        userVo.setAccessToken(JwtUtil.getAccessToken(userId));
         return ResponseVO.success(userVo);
     }
 

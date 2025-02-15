@@ -11,6 +11,10 @@
     <file url="file://$PROJECT_DIR$/media-server-10000/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/media-server/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/media-server/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/room-consumer-9002/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/room-consumer-9002/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/room-provider-9003/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/room-provider-9003/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/user-consumer-9001/src/main/java" charset="UTF-8" />

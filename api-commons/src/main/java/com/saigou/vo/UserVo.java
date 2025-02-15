@@ -47,4 +47,8 @@ public class UserVo implements Serializable{
         @TableField("accessToken")
         private String accessToken;
 
+
+        @TableField("refreshToken")
+        private String refreshToken;
+
 }

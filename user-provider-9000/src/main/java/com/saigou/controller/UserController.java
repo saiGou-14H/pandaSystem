@@ -46,7 +46,7 @@ public class UserController {
         return userService.update(user);
     }
     @GetMapping("get")
-    @Operation(summary = "查询",description = "根据xx查找用户")
+    @Operation(summary = "查询",description = "根据id或account查找用户")
     public User get(@RequestParam(name = "id",required = false)Long id,@RequestParam(name = "account",required = false)String account){
         if (account!=null)
             return userService.getByAccount(account);

@@ -15,6 +15,8 @@ public enum ResponseEnum {
         INCORRECT_CREDENTIALS(14, "账号或密码错误"),
         NOT_LOGIN_IN(15, "账号未登录"),
         UNAUTHORIZED(16, "没有权限")
+        //token过期
+        ,TOKEN_EXPIRED(401,"token过期")
         ;
         Integer code;
         String message;

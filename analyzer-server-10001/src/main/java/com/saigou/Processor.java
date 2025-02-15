@@ -118,6 +118,7 @@ class PushThread extends Thread{
             // 检查 frame 是否有效
             if (frame.image != null || frame.samples != null) {
                 // 记录帧
+                recorder.setTimestamp(frame.timestamp);
                 recorder.record(frame);
             }
         }

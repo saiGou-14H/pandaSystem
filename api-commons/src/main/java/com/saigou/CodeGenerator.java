@@ -15,7 +15,11 @@ import java.util.function.Consumer;
 public class CodeGenerator {
     public static void main(String[] args) {
         List<String> tables = new ArrayList<>();
-        tables.add("user");
+//        tables.add("user");
+        tables.add("room");
+//        tables.add("student");
+//        tables.add("sclass");
+//        tables.add("scourse");
 
 
         FastAutoGenerator.create("jdbc:p6spy:mysql://scnu.saigou.work:3306/scnu?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC&allowMultiQueries=true&allowPublicKeyRetrieval=true","scnu","Qq70852096..")

@@ -4,18 +4,12 @@ import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.jwt.JWTUtil;
 import cn.hutool.jwt.JWTValidator;
-import com.saigou.api.userApi;
-import com.saigou.entity.User;
-import io.swagger.annotations.Api;
-import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
-
-import java.net.http.HttpRequest;
 import java.util.Map;
 
 public class JwtUtil {
     static final String secret = "70852096";
-    public static String getToken(Long id) {
+    public static String getAccessToken(Long id) {
         DateTime date = DateUtil.date();
         //生效时间（JWTPayload.NOT_BEFORE）不能晚于当前时间
         //失效时间（JWTPayload.EXPIRES_AT）不能早于当前时间
@@ -28,7 +22,21 @@ public class JwtUtil {
                 .setKey(JwtUtil.secret.getBytes())
                 .setPayload("id", id)
                 .sign();
-
+        return token;
+    }
+    public static  String getRefreshToken(Long id) {
+        DateTime date = DateUtil.date();
+        //生效时间（JWTPayload.NOT_BEFORE）不能晚于当前时间
+        //失效时间（JWTPayload.EXPIRES_AT）不能早于当前时间
+        //签发时间（JWTPayload.ISSUED_AT）不能晚于当前时间
+        DateTime end_date = DateUtil.offsetDay(date,1);
+        String token = cn.hutool.jwt.JWT.create()
+                .setNotBefore(date)
+                .setIssuedAt(date)
+                .setExpiresAt(end_date)
+                .setKey(JwtUtil.secret.getBytes())
+                .setPayload("id", id)
+                .sign();
         return token;
     }
     public static boolean verifyToken(String token) {
@@ -51,13 +59,11 @@ public class JwtUtil {
     }
 
 
-    public static Long getUserId(HttpServletRequest request) {
+    public static Long getUserId(HttpServletRequest request){
         String token = getHeaderToken(request);
-        System.out.println(token);
         if (!verifyToken(token)) {
-            throw new RuntimeException("token失效，登陆过期！");
+            throw new CustomException(ResponseEnum.TOKEN_EXPIRED);
         }
-
         Long id = Long.parseLong(getTokenInfo(token).get("id").toString());
         return id;
     }
