@@ -129,5 +129,10 @@
    
     否则只添加@LoadBalanced是提示找不到服务名的
    ```
-7. 
+7. proto构建失败
+    ```agsl
+    Could not make proto path relative: C:\Users\70852\Desktop\代码\后端\pandaSystem\analyzer-server-10001\src\main\proto\a.proto: No such file or directory
+    编辑器编码改为gbk格式，文件路径不能有中文汉字
+   ```
+    
 ***

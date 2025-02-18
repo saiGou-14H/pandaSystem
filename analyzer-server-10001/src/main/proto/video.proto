@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.saigou.grpc";
+option java_outer_classname = "VideoProto";
+// option objc_class_prefix = "Hello";
+
+
+service VideoProcessor {
+  rpc ProcessFrame(stream VideoFrame) returns (stream AnalysisResult);
+}
+
+message VideoFrame {
+  bytes image_data = 1;      // 图片帧数据
+  int64 timestamp = 2;      // 时间戳（毫秒）
+  int64 algorithms_type = 3;//算法类别
+  int64 height = 4;          // 高度
+  int64 width = 5;          // 宽度
+}
+
+message AnalysisResult {
+  int64 timestamp = 1; // 时间戳（毫秒）
+  repeated BoundingBox boxes = 2;  // 检测框
+  string data = 3; // 算法返回数据
+  bytes image_data = 4;
+}
+
+message BoundingBox {
+  string label = 1;         // 类别标签
+  int64 x = 2;              // 左上角X坐标
+  int64 y = 3;              // 左上角Y坐标
+  int64 width = 4;          // 框宽度
+  int64 height = 5;         // 框高度
+  float score = 6;          // 置信度
+  string track_id = 7;      // 轨迹ID
+  string data = 8;          // 额外数据(JSON格式)
+}

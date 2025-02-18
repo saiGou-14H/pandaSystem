@@ -17,9 +17,5 @@
         <module name="room-consumer-9002" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="media-server" target="17" />
-      <module name="VideoServer" target="1.7" />
-    </bytecodeTargetLevel>
   </component>
 </project>

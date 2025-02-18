@@ -1,7 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="Encoding">
+  <component name="Encoding" defaultCharsetForPropertiesFiles="GBK">
     <file url="file://$PROJECT_DIR$/analyzer-server-10001/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/analyzer-server-10001/src/main/java/com/saigou/entity/AnalysisResult.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/analyzer-server-10001/src/main/java/com/saigou/entity/BoundingBox.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/analyzer-server-10001/src/main/java/com/saigou/entity/VideoFrame.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/analyzer-server-10001/src/main/java/com/saigou/entity/VideoProcessorGrpc.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/analyzer-server-10001/src/main/java/com/saigou/grpc/AnalysisResult.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/analyzer-server-10001/src/main/java/com/saigou/grpc/AnalysisResult.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/analyzer-server-10001/src/main/java/com/saigou/grpc/AnalysisResult.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/analyzer-server-10001/src/main/java/com/saigou/grpc/AnalysisResultOrBuilder.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/analyzer-server-10001/src/main/java/com/saigou/grpc/AnalysisResultOrBuilder.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/analyzer-server-10001/src/main/java/com/saigou/grpc/AnalysisResultOrBuilder.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/analyzer-server-10001/src/main/java/com/saigou/grpc/BoundingBox.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/analyzer-server-10001/src/main/java/com/saigou/grpc/BoundingBox.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/analyzer-server-10001/src/main/java/com/saigou/grpc/BoundingBox.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/analyzer-server-10001/src/main/java/com/saigou/grpc/BoundingBoxOrBuilder.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/analyzer-server-10001/src/main/java/com/saigou/grpc/BoundingBoxOrBuilder.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/analyzer-server-10001/src/main/java/com/saigou/grpc/BoundingBoxOrBuilder.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/analyzer-server-10001/src/main/java/com/saigou/grpc/VideoFrame.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/analyzer-server-10001/src/main/java/com/saigou/grpc/VideoFrame.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/analyzer-server-10001/src/main/java/com/saigou/grpc/VideoFrame.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/analyzer-server-10001/src/main/java/com/saigou/grpc/VideoFrameOrBuilder.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/analyzer-server-10001/src/main/java/com/saigou/grpc/VideoFrameOrBuilder.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/analyzer-server-10001/src/main/java/com/saigou/grpc/VideoFrameOrBuilder.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/analyzer-server-10001/src/main/java/com/saigou/grpc/VideoProcessorGrpc.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/analyzer-server-10001/src/main/java/com/saigou/grpc/VideoProcessorGrpc.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/analyzer-server-10001/src/main/java/com/saigou/grpc/VideoProcessorGrpc.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/analyzer-server-10001/src/main/java/com/saigou/grpc/VideoProto.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/analyzer-server-10001/src/main/java/com/saigou/grpc/VideoProto.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/analyzer-server-10001/src/main/java/com/saigou/grpc/VideoProto.java" charset="GBK" />
     <file url="file://$PROJECT_DIR$/analyzer-server-10001/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/api-commons/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/api-commons/src/main/resources" charset="UTF-8" />
@@ -9,8 +37,6 @@
     <file url="file://$PROJECT_DIR$/gateway-9999/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/media-server-10000/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/media-server-10000/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/media-server/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/media-server/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/room-consumer-9002/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/room-consumer-9002/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/room-provider-9003/src/main/java" charset="UTF-8" />
@@ -19,9 +45,8 @@
     <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/user-consumer-9001/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/user-consumer-9001/src/main/resources" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/user-provider-9000/media-server/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/user-provider-9000/media-server/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/user-provider-9000/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/user-provider-9000/src/main/resources" charset="UTF-8" />
+    <file url="PROJECT" charset="GBK" />
   </component>
 </project>
