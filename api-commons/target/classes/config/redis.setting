@@ -11,11 +11,11 @@ host = scnu.saigou.work
 # 端口，默认6379
 port = 6379
 # 超时，默认2000
-timeout = 2000
+timeout = 5000
 # 连接超时，默认timeout
-connectionTimeout = 2000
+connectionTimeout = 5000
 # 读取超时，默认timeout
-soTimeout = 2000
+soTimeout = 5000
 # 密码，默认无
 password = 70852096
 # 数据库序号，默认0
@@ -38,11 +38,11 @@ jmxEnabled = true;
 # 是否启用后进先出, 默认true
 lifo = true;
 # 最大空闲连接数, 默认16个
-maxIdle = 8
+maxIdle = 32
 # 最小空闲连接数, 默认0
 minIdle = 0
 # 最大连接数, 默认16个
-maxTotal = 16
+maxTotal = 32
 # 获取连接时的最大等待毫秒数(如果设置为阻塞时BlockWhenExhausted),如果超时就抛异常, 小于零:阻塞不确定的时间,  默认-1
 maxWaitMillis = -1
 # 逐出连接的最小空闲时间 默认1800000毫秒(30分钟)
