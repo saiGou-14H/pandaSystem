@@ -49,6 +49,12 @@ public class PushStreamThread extends Thread{
         // 限制线程数（AMF对多线程支持有限）
         recorder.setVideoOption("threads", "8");
 
+        recorder.setOption("rtbufsize", "2000k");     // 实时缓冲区大小
+        recorder.setOption("max_delay", "500000");    // 最大延迟（微秒）
+        recorder.setOption("reconnect", "1");         // 启用自动重连
+        recorder.setOption("reconnect_at_eof", "1");  // 在EOF时重连
+        recorder.setOption("reconnect_streamed", "1");// 流式重连
+
 //        recorder.setVideoCodecName("h264_nvenc"); // NVIDIA
 //        recorder.setPixelFormat(avutil.AV_PIX_FMT_YUV420P);
 //        recorder.setVideoOption("pix_fmt", "yuv420p");      // 双重保险
@@ -74,10 +80,10 @@ public class PushStreamThread extends Thread{
         while (resultCache.isEmpty()){
             Thread.sleep(20); // 避免持续轮询，减少 CPU 占用
         }
-
+        long oldtimestamp=0;
         while (!isInterrupted()) {
             Frame frame = pushFrameQueue.poll(5, TimeUnit.MILLISECONDS);
-            if (frame != null && frame.image != null){
+            if (frame != null && frame.image != null && frame.timestamp > oldtimestamp){
                 //等待对应分析结果
                 long startWait = System.currentTimeMillis();
                 while (System.currentTimeMillis() - startWait < MAX_WAIT_MS) {
@@ -89,9 +95,11 @@ public class PushStreamThread extends Thread{
                 Frame result = resultCache.remove(frame.timestamp);
                 if (result != null) {
                     recorder.record(result);
+                    oldtimestamp=result.timestamp;
                     result.close();
                 } else {
                     recorder.record(frame);
+                    oldtimestamp=frame.timestamp;
                 }
 
                 frameCount++;
@@ -102,8 +110,11 @@ public class PushStreamThread extends Thread{
                     frameCount = 0;
                     startTime = System.currentTimeMillis();
                 }
+                if(frame.timestamp < oldtimestamp){
+                    System.out.println("时间戳回退,丢弃帧："+oldtimestamp+"->"+frame.timestamp);
+                }
+                frame.clone();
             }
-            frame.clone();
         }
     }
 

@@ -67,7 +67,7 @@ public class EncodeThread extends Thread{
             frame.close();  // 丢弃当前帧
         }
     }
-    int count = 180;
+    int count = 1;
     int frameCount = 0;
     @Override
     public void run() {

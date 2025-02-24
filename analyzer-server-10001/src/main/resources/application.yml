@@ -23,3 +23,4 @@ custom:
     name: Authenticate
     token-url: http://kwqqr48rgo.cdhttp.cn/oauth2/token
     authorization-url: http://kwqqr48rgo.cdhttp.cn/oauth2/authorize
+

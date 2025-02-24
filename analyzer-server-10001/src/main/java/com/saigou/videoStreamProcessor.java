@@ -13,13 +13,13 @@ import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 class videoStreamProcessor {
-    private LinkedBlockingQueue pullframeQueue = new LinkedBlockingQueue<Frame>(70);
+    private LinkedBlockingQueue pullframeQueue = new LinkedBlockingQueue<Frame>(90);
 
-    private LinkedBlockingQueue imageQueue = new LinkedBlockingQueue<ImageWrapper>(70);
+    private LinkedBlockingQueue imageQueue = new LinkedBlockingQueue<ImageWrapper>(90);
 
     private ConcurrentSkipListMap analyzerCache = new ConcurrentSkipListMap<Long, Frame>();
 
-    private LinkedBlockingQueue pushFrameQueue = new LinkedBlockingQueue<ByteString>(70);
+    private LinkedBlockingQueue pushFrameQueue = new LinkedBlockingQueue<ByteString>(90);
     PullStreamThread pullStreamThread;
     EncodeThread encodeThread;
     AnalyzerThread analyzerThread;
