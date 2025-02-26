@@ -64,8 +64,6 @@ public class EncodeThread extends Thread{
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("帧处理失败"+e.getMessage());
-        }finally {
-            frame.close();
         }
     }
 
@@ -79,7 +77,7 @@ public class EncodeThread extends Thread{
                 if (frame != null && frame.image != null) {
                         if(frameCount%count==0){
                             frameProcessorExecutor.submit(() -> {
-                                handleFrame(frame.clone());
+                                handleFrame(frame);
                             });
                         }
                     pushFrameQueue.offer(frame);

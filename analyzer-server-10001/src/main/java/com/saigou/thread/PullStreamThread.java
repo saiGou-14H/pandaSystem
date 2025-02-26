@@ -44,6 +44,7 @@ public class PullStreamThread extends Thread{
                     }
                     frameQueue.offer(frame.clone());
                 }
+                frame.close();
             }
         }
     }

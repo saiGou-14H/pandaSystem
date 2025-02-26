@@ -94,7 +94,7 @@ public class PushStreamThread extends Thread{
                     if (result != null) break;
                 }
                 // 获取并处理结果
-                Frame result = resultCache.remove(frame.timestamp);
+                Frame result = getCacheFrame(frame.timestamp);
                 if (result != null) {
                     recorder.record(result);
                     oldtimestamp=result.timestamp;

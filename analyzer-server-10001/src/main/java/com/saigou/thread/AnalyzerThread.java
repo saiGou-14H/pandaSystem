@@ -23,7 +23,7 @@ public class AnalyzerThread extends Thread implements StreamObserver<AnalysisRes
     public final VideoProcessorGrpc.VideoProcessorStub stub;
     public StreamObserver<VideoFrame> requestObserver;
     private final ExecutorService frameProcessorExecutor = Executors.newFixedThreadPool(16);
-    public  OpenCVFrameConverter.ToMat converter = new OpenCVFrameConverter.ToMat();
+    public OpenCVFrameConverter.ToMat converter;
     public AnalyzerThread(LinkedBlockingQueue<ImageWrapper> imageQueue, ConcurrentSkipListMap<Long,Frame> resultCache){
         this.resultCache = resultCache;
         this.imageQueue = imageQueue;
@@ -33,6 +33,7 @@ public class AnalyzerThread extends Thread implements StreamObserver<AnalysisRes
                 .build();
         stub = VideoProcessorGrpc.newStub(channel);
         requestObserver = stub.processFrame(this);
+        converter = new OpenCVFrameConverter.ToMat();
     }
     @Override
     public void run() {
@@ -61,10 +62,10 @@ public class AnalyzerThread extends Thread implements StreamObserver<AnalysisRes
             try {
                 // jpeg解码
                 frameProcessorExecutor.submit(() -> {
-                        Mat mat = dencodeJpeg(imageData);
-                        Frame frame = converter.convert(mat);
-                        frame.timestamp = analysisResult.getTimestamp();
-                        resultCache.put(frame.timestamp, frame);
+                    Mat mat = dencodeJpeg(imageData);//释放该资源会导致帧顺序错误
+                    Frame frame = converter.convert(mat);
+                    frame.timestamp = analysisResult.getTimestamp();
+                    resultCache.put(frame.timestamp, frame);
                 });
             } catch (Exception e) {
                 System.out.println("处理图像时出错: " + e.getMessage());
@@ -95,5 +96,8 @@ public class AnalyzerThread extends Thread implements StreamObserver<AnalysisRes
         super.interrupt();
         channel.shutdown();
         frameProcessorExecutor.shutdown();
+        if (converter!=null){
+            converter.close();
+        }
     }
 }
