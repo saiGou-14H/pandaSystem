@@ -11,14 +11,12 @@ import org.bytedeco.opencv.global.opencv_imgproc;
 import org.bytedeco.opencv.opencv_core.Mat;
 import org.bytedeco.opencv.opencv_core.Size;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public class EncodeThread extends Thread{
     public LinkedBlockingQueue<Frame> frameQueue;
     public LinkedBlockingQueue<ImageWrapper> imageQueue;
+    public CopyOnWriteArrayList<Long> keyList;
     public LinkedBlockingQueue<Frame> pushFrameQueue;
     private static final IntPointer jpegParams = new IntPointer(
             opencv_imgcodecs.IMWRITE_JPEG_QUALITY, 80//压缩率80%
@@ -38,10 +36,11 @@ public class EncodeThread extends Thread{
             return ByteString.copyFrom(buffer.getStringBytes());
         }
     }
-    public EncodeThread(LinkedBlockingQueue<Frame> frameQueue, LinkedBlockingQueue<ImageWrapper> imageQueue,LinkedBlockingQueue<Frame> pushFrameQueue) {
+    public EncodeThread(LinkedBlockingQueue<Frame> frameQueue, LinkedBlockingQueue<ImageWrapper> imageQueue, LinkedBlockingQueue<Frame> pushFrameQueue, CopyOnWriteArrayList<Long> keyList) {
         this.frameQueue = frameQueue;
         this.imageQueue = imageQueue;
         this.pushFrameQueue = pushFrameQueue;
+        this.keyList = keyList;
     }
 
     private final ExecutorService frameProcessorExecutor = Executors.newFixedThreadPool(16);
@@ -49,11 +48,12 @@ public class EncodeThread extends Thread{
     private void handleFrame(Frame frame) {
         try (OpenCVFrameConverter.ToMat converter = new OpenCVFrameConverter.ToMat();
              Mat mat = converter.convert(frame);// 缩放图像
-             Mat resizedMat = new Mat()) {
-            Size newSize = new Size(mat.cols() / 2, mat.rows() / 2); // 缩小为原始尺寸的一半
+             Mat resizedMat = new Mat();
+             Size newSize = new Size(mat.cols() / 2, mat.rows() / 2);) {
             opencv_imgproc.resize(mat, resizedMat, newSize);
             ByteString bytes = encodeJpeg(resizedMat);
             ImageWrapper wrapper = new ImageWrapper(bytes, frame.timestamp);
+            keyList.add(frame.timestamp);
             if (imageQueue.remainingCapacity() > 10) { // 保持缓冲余量
                 imageQueue.offer(wrapper);
             } else {
@@ -62,40 +62,45 @@ public class EncodeThread extends Thread{
                 imageQueue.offer(wrapper);
             }
         } catch (Exception e) {
+            e.printStackTrace();
             System.out.println("帧处理失败"+e.getMessage());
-        } finally {
-            frame.close();  // 丢弃当前帧
+        }finally {
+            frame.close();
         }
     }
-    int count = 1;
+
+    int count = 5;
     int frameCount = 0;
     @Override
     public void run() {
         while (!isInterrupted()){
-            try{
+            try {
                 Frame frame = frameQueue.poll(5, TimeUnit.MILLISECONDS);
-                if (frame != null) {
-                    if (frame.image != null) {
-                        frameProcessorExecutor.submit(() -> {
-//                        long startTime = System.currentTimeMillis();
-                            if(frameCount%count==0){
+                if (frame != null && frame.image != null) {
+                        if(frameCount%count==0){
+                            frameProcessorExecutor.submit(() -> {
                                 handleFrame(frame.clone());
-                            }
-                            pushFrameQueue.offer(frame);
-                            frameCount++;
-//                        System.out.println("编码处理帧耗时：" + (System.currentTimeMillis() - startTime) + "ms");
-                        });
-                    }
+                            });
+                        }
+                    pushFrameQueue.offer(frame);
+                    frameCount++;
+
                 }
-            }catch (InterruptedException e){
-                e.printStackTrace();
+            } catch (InterruptedException e) {
+                interrupt();
             }
         }
     }
     @Override
     public void interrupt() {
         super.interrupt();
-        frameProcessorExecutor.shutdownNow();
-
+        frameProcessorExecutor.shutdown(); // 温和关闭
+        try {
+            if (!frameProcessorExecutor.awaitTermination(2, TimeUnit.SECONDS)) {
+                frameProcessorExecutor.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 }

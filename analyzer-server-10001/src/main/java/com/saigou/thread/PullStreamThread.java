@@ -30,14 +30,18 @@ public class PullStreamThread extends Thread{
     @SneakyThrows
     public void run() {
         Frame frame;
+        int time = 0;
         while (!isInterrupted() && (frame = grabber.grab()) != null) {
-            if (frame!=null && frame.image != null){
+            if (frame.image != null){
+                frame.timestamp = time++;
                 if (frameQueue.remainingCapacity() > 10) { // 保持缓冲余量
                     frameQueue.offer(frame.clone());
                 } else {
                     // 丢弃旧帧保持实时性
                     Frame oldFrame = frameQueue.poll();
-                    oldFrame.close();
+                    if (oldFrame != null) {
+                        oldFrame.close();
+                    }
                     frameQueue.offer(frame.clone());
                 }
             }

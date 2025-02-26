@@ -6,26 +6,27 @@ import org.bytedeco.ffmpeg.global.avcodec;
 import org.bytedeco.javacv.*;
 import org.bytedeco.opencv.global.opencv_core;
 
-import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.concurrent.*;
 
 public class PushStreamThread extends Thread{
     public FFmpegFrameGrabber grabber;
     public FFmpegFrameRecorder recorder;
     public LinkedBlockingQueue<Frame> pushFrameQueue;
     public ConcurrentSkipListMap<Long, Frame> resultCache;
+    public CopyOnWriteArrayList<Long> keyList;
     // 新增流量控制属性
     private final Semaphore semaphore = new Semaphore(30);  // 限制每秒最多30帧
 
 
 
     @SneakyThrows
-    public PushStreamThread(String url, FFmpegFrameGrabber grabber, LinkedBlockingQueue<Frame> pushFrameQueue, ConcurrentSkipListMap<Long, Frame> resultCache) {
+    public PushStreamThread(String url, FFmpegFrameGrabber grabber, LinkedBlockingQueue<Frame> pushFrameQueue, ConcurrentSkipListMap<Long, Frame> resultCache,CopyOnWriteArrayList<Long> keyList) {
         this.resultCache = resultCache;
         this.grabber = grabber;
         this.pushFrameQueue = pushFrameQueue;
+        this.keyList = keyList;
         // 2. 推流初始化
         recorder = new FFmpegFrameRecorder(
                 url,
@@ -71,8 +72,7 @@ public class PushStreamThread extends Thread{
 
     @SneakyThrows
     public void run(){
-
-        final long MAX_WAIT_MS = (long) (1000/recorder.getFrameRate()-5); // 最大等待结果时间
+        final long MAX_WAIT_MS = (long) ((1000/recorder.getFrameRate())-10); // 最大等待结果时间
         System.out.println("最大延迟："+MAX_WAIT_MS+"ms");
         long startTime = System.currentTimeMillis();
         int frameCount = 0;
@@ -80,16 +80,18 @@ public class PushStreamThread extends Thread{
         while (resultCache.isEmpty()){
             Thread.sleep(20); // 避免持续轮询，减少 CPU 占用
         }
-        long oldtimestamp=0;
+        long oldtimestamp=-1;
         while (!isInterrupted()) {
             Frame frame = pushFrameQueue.poll(5, TimeUnit.MILLISECONDS);
+            if(frame != null && frame.timestamp <= oldtimestamp){
+                System.out.println("时间戳回退,丢弃帧："+oldtimestamp+"->"+frame.timestamp);
+            }
             if (frame != null && frame.image != null && frame.timestamp > oldtimestamp){
                 //等待对应分析结果
                 long startWait = System.currentTimeMillis();
                 while (System.currentTimeMillis() - startWait < MAX_WAIT_MS) {
                     Frame result = resultCache.get(frame.timestamp);
                     if (result != null) break;
-                    Thread.sleep(5); // 避免持续轮询，减少 CPU 占用
                 }
                 // 获取并处理结果
                 Frame result = resultCache.remove(frame.timestamp);
@@ -110,12 +112,31 @@ public class PushStreamThread extends Thread{
                     frameCount = 0;
                     startTime = System.currentTimeMillis();
                 }
-                if(frame.timestamp < oldtimestamp){
-                    System.out.println("时间戳回退,丢弃帧："+oldtimestamp+"->"+frame.timestamp);
-                }
-                frame.clone();
+                frame.close();
             }
         }
+    }
+
+    private Frame getCacheFrame(long timestamp) throws InterruptedException {
+        Long key;
+        Iterator<Long> list = keyList.iterator();
+        while (list.hasNext()){
+            key = list.next();
+            if (key==timestamp){
+                return resultCache.remove(timestamp);
+            }
+            if (key<timestamp){
+                Frame remove = resultCache.remove(key);
+                if (remove != null) {
+                    keyList.remove(key);
+                    remove.close();
+                    System.out.println("[缓存帧超时:丢弃]："+key);
+                }
+            }else{
+                break;
+            }
+        }
+        return null;
     }
 
     @Override

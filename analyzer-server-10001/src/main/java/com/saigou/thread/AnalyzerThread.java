@@ -10,6 +10,7 @@ import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
 import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.OpenCVFrameConverter;
+import org.bytedeco.opencv.opencv_core.Mat;
 
 import java.util.concurrent.*;
 
@@ -17,13 +18,13 @@ import static com.saigou.thread.EncodeThread.dencodeJpeg;
 
 public class AnalyzerThread extends Thread implements StreamObserver<AnalysisResult> {
     public LinkedBlockingQueue<ImageWrapper> imageQueue;
-    public ConcurrentSkipListMap resultCache;
+    public ConcurrentSkipListMap<Long,Frame> resultCache;
     public final ManagedChannel channel;
     public final VideoProcessorGrpc.VideoProcessorStub stub;
     public StreamObserver<VideoFrame> requestObserver;
-    public OpenCVFrameConverter.ToMat converter;
     private final ExecutorService frameProcessorExecutor = Executors.newFixedThreadPool(16);
-    public AnalyzerThread(LinkedBlockingQueue<ImageWrapper> imageQueue, ConcurrentSkipListMap<Long,Frame> resultCache) {
+    public  OpenCVFrameConverter.ToMat converter = new OpenCVFrameConverter.ToMat();
+    public AnalyzerThread(LinkedBlockingQueue<ImageWrapper> imageQueue, ConcurrentSkipListMap<Long,Frame> resultCache){
         this.resultCache = resultCache;
         this.imageQueue = imageQueue;
         channel = ManagedChannelBuilder.forAddress("localhost", 50051)
@@ -32,7 +33,6 @@ public class AnalyzerThread extends Thread implements StreamObserver<AnalysisRes
                 .build();
         stub = VideoProcessorGrpc.newStub(channel);
         requestObserver = stub.processFrame(this);
-        converter = new OpenCVFrameConverter.ToMat();
     }
     @Override
     public void run() {
@@ -50,7 +50,7 @@ public class AnalyzerThread extends Thread implements StreamObserver<AnalysisRes
                     requestObserver.onNext(videoFrame);
                 }
             }catch (InterruptedException e){
-                e.printStackTrace();
+                interrupt();
             }
         }
     }
@@ -61,9 +61,10 @@ public class AnalyzerThread extends Thread implements StreamObserver<AnalysisRes
             try {
                 // jpeg解码
                 frameProcessorExecutor.submit(() -> {
-                    Frame frame = converter.convert(dencodeJpeg(imageData));
-                    frame.timestamp = analysisResult.getTimestamp();
-                    resultCache.put(frame.timestamp, frame);
+                        Mat mat = dencodeJpeg(imageData);
+                        Frame frame = converter.convert(mat);
+                        frame.timestamp = analysisResult.getTimestamp();
+                        resultCache.put(frame.timestamp, frame);
                 });
             } catch (Exception e) {
                 System.out.println("处理图像时出错: " + e.getMessage());
@@ -75,7 +76,13 @@ public class AnalyzerThread extends Thread implements StreamObserver<AnalysisRes
 
     @Override
     public void onError(Throwable throwable) {
-        System.out.println("处理图像时出错: " + throwable.getMessage());
+        System.err.println("gRPC 流错误: " + throwable.getMessage());
+        // 尝试重建连接
+        try {
+            requestObserver = stub.processFrame(this); // 重连
+        } catch (Exception e) {
+            System.err.println("重连失败: " + e.getMessage());
+        }
     }
 
     @Override
@@ -86,7 +93,6 @@ public class AnalyzerThread extends Thread implements StreamObserver<AnalysisRes
     @Override
     public void interrupt() {
         super.interrupt();
-        requestObserver.onCompleted();
         channel.shutdown();
         frameProcessorExecutor.shutdown();
     }

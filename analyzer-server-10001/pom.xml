@@ -20,7 +20,7 @@
         <dependency>
             <groupId>org.bytedeco</groupId>
             <artifactId>javacv-platform</artifactId>
-            <version>1.5.7</version>
+            <version>1.5.9</version>  <!-- 最新版本 -->
         </dependency>
         <dependency>
             <groupId>io.grpc</groupId>
