@@ -11,7 +11,7 @@ public class Processor {
         String url2 = "rtmp://127.0.0.1:7935/live/test3";
         videoStreamProcessor videoStreamProcessor = new videoStreamProcessor(url1, url2);
         videoStreamProcessor.start();
-        Thread.sleep(1000000);
+        Thread.sleep(100000000);
         videoStreamProcessor.stop();
     }
 }

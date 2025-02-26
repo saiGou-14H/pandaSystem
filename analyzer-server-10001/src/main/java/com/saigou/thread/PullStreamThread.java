@@ -1,13 +1,13 @@
 package com.saigou.thread;
 
+import com.saigou.util.Util;
 import lombok.SneakyThrows;
-import org.bytedeco.ffmpeg.global.avutil;
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.FrameGrabber;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class PullStreamThread extends Thread{
+public class PullStreamThread extends Thread {
     public FFmpegFrameGrabber grabber;
     public LinkedBlockingQueue<Frame> frameQueue;
 
@@ -21,45 +21,48 @@ public class PullStreamThread extends Thread{
         //关键配置：启用AMF硬件解码
         grabber.setImageHeight(maxImageHeight);
         grabber.setImageWidth(maxImageWidth);
-        grabber.setOption("hwaccel", "amf");         // 指定使用AMF加速
+        grabber.setOption("hwaccel", "auto"); // 改为自动检测
         grabber.setOption("hwaccel_device", "gpu");  // 指定GPU设备
-//        grabber.setPixelFormat(avutil.AV_PIX_FMT_YUV420P);
         grabber.setOption("rtsp_transport", "tcp");
-        grabber.start();
+        grabber.start(); // 自动探测分辨率，无需强制设置
     }
+
     @SneakyThrows
     public void run() {
         Frame frame;
-        int time = 0;
         while (!isInterrupted() && (frame = grabber.grab()) != null) {
-            if (frame.image != null){
-                frame.timestamp = time++;
-                if (frameQueue.remainingCapacity() > 10) { // 保持缓冲余量
-                    frameQueue.offer(frame.clone());
+            if (frame.image != null) {
+                Frame clonedFrame = Util.createDeepCopy(frame);
+                if (frameQueue.remainingCapacity() > 10) {
+                    frameQueue.offer(clonedFrame);
                 } else {
-                    // 丢弃旧帧保持实时性
                     Frame oldFrame = frameQueue.poll();
-                    if (oldFrame != null) {
-                        oldFrame.close();
-                    }
-                    frameQueue.offer(frame.clone());
+                    Util.safeCloseFrame(oldFrame);
+                    frameQueue.offer(clonedFrame);
                 }
-                frame.close();
+                // 控制日志频率，每30帧打印一次
+                if (clonedFrame.timestamp % 30 == 0) {
+                    System.out.println("拉流帧时间戳：" + clonedFrame.timestamp);
+                }
             }
         }
     }
+
     @Override
-    public void interrupt(){
+    public void interrupt() {
         super.interrupt();
-        if (grabber != null) {
-            try {
-                grabber.stop();    // 停止抓取
-                grabber.release(); // 释放抓取资源
-                grabber.close();   // 关闭连接
-            } catch (FrameGrabber.Exception e) {
-                throw new RuntimeException("停止或释放抓取资源时出错", e);
+        try {
+            if (grabber != null) {
+                grabber.stop();
+                grabber.release();
+                grabber.close();
             }
+        } catch (FrameGrabber.Exception e) {
+            System.err.println("停止抓取器出错：" + e.getMessage());
         }
-        System.out.println("拉流结束");
+        // 清空队列并关闭剩余帧
+        frameQueue.forEach(Frame::close);
+        frameQueue.clear();
+        System.out.println("拉流线程终止");
     }
 }

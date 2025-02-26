@@ -1,6 +1,7 @@
 package com.saigou.thread;
 
 import com.saigou.grpc.AnalysisResult;
+import com.saigou.util.Util;
 import lombok.SneakyThrows;
 import org.bytedeco.ffmpeg.global.avcodec;
 import org.bytedeco.javacv.*;
@@ -41,24 +42,19 @@ public class PushStreamThread extends Thread{
         recorder.setVideoOption("tune", "zerolatency"); // 零延迟模式
         recorder.setVideoOption("crf", "23"); // 画质与码率平衡
         recorder.setGopSize(60); // 关键帧间隔（帧数）
-        // AMF 硬件编码专用参数
+
         recorder.setVideoOption("preset", "ultrafast");     // 预设模式
         recorder.setVideoOption("quality", "speed");        // 速度优先
-        recorder.setVideoCodecName("h264_amf");// AMD
         recorder.setVideoOption("rc", "cbr_ld_hq");         // 低延迟码率控制
         recorder.setVideoOption("usage", "ultralowlatency");// 超低延迟模式
-        // 限制线程数（AMF对多线程支持有限）
-        recorder.setVideoOption("threads", "8");
 
+        recorder.setVideoOption("threads", "8");
         recorder.setOption("rtbufsize", "2000k");     // 实时缓冲区大小
         recorder.setOption("max_delay", "500000");    // 最大延迟（微秒）
         recorder.setOption("reconnect", "1");         // 启用自动重连
         recorder.setOption("reconnect_at_eof", "1");  // 在EOF时重连
         recorder.setOption("reconnect_streamed", "1");// 流式重连
 
-//        recorder.setVideoCodecName("h264_nvenc"); // NVIDIA
-//        recorder.setPixelFormat(avutil.AV_PIX_FMT_YUV420P);
-//        recorder.setVideoOption("pix_fmt", "yuv420p");      // 双重保险
         recorder.start();
 
         // 在程序初始化时启用 OpenCL
@@ -98,7 +94,7 @@ public class PushStreamThread extends Thread{
                 if (result != null) {
                     recorder.record(result);
                     oldtimestamp=result.timestamp;
-                    result.close();
+                    Util.safeCloseFrame(result);
                 } else {
                     recorder.record(frame);
                     oldtimestamp=frame.timestamp;
@@ -112,7 +108,7 @@ public class PushStreamThread extends Thread{
                     frameCount = 0;
                     startTime = System.currentTimeMillis();
                 }
-                frame.close();
+                Util.safeCloseFrame(frame);
             }
         }
     }
@@ -129,7 +125,7 @@ public class PushStreamThread extends Thread{
                 Frame remove = resultCache.remove(key);
                 if (remove != null) {
                     keyList.remove(key);
-                    remove.close();
+                    Util.safeCloseFrame(remove);
                     System.out.println("[缓存帧超时:丢弃]："+key);
                 }
             }else{
