@@ -7,7 +7,7 @@ import org.bytedeco.opencv.opencv_core.Mat;
 import static org.bytedeco.ffmpeg.global.avutil.av_frame_free;
 import static org.bytedeco.ffmpeg.global.avutil.av_frame_unref;
 
-public class Util {
+public class Utils {
     public static Frame createDeepCopy(Frame frame) {
         Frame clonedFrame = new Frame();
         clonedFrame = frame.clone();

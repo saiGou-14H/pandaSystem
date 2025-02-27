@@ -1,14 +1,12 @@
 package com.saigou.thread;
 
-import com.saigou.grpc.AnalysisResult;
-import com.saigou.util.Util;
+import com.saigou.util.Utils;
 import lombok.SneakyThrows;
 import org.bytedeco.ffmpeg.global.avcodec;
 import org.bytedeco.javacv.*;
 import org.bytedeco.opencv.global.opencv_core;
 
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.concurrent.*;
 
 public class PushStreamThread extends Thread{
@@ -90,11 +88,11 @@ public class PushStreamThread extends Thread{
                     if (result != null) break;
                 }
                 // 获取并处理结果
-                Frame result = getCacheFrame(frame.timestamp);
+                Frame result = CacheFrameHandler(frame.timestamp);
                 if (result != null) {
                     recorder.record(result);
                     oldtimestamp=result.timestamp;
-                    Util.safeCloseFrame(result);
+                    Utils.safeCloseFrame(result);
                 } else {
                     recorder.record(frame);
                     oldtimestamp=frame.timestamp;
@@ -108,12 +106,12 @@ public class PushStreamThread extends Thread{
                     frameCount = 0;
                     startTime = System.currentTimeMillis();
                 }
-                Util.safeCloseFrame(frame);
+                Utils.safeCloseFrame(frame);
             }
         }
     }
 
-    private Frame getCacheFrame(long timestamp) throws InterruptedException {
+    private Frame CacheFrameHandler(long timestamp) throws InterruptedException {
         Long key;
         Iterator<Long> list = keyList.iterator();
         while (list.hasNext()){
@@ -125,7 +123,7 @@ public class PushStreamThread extends Thread{
                 Frame remove = resultCache.remove(key);
                 if (remove != null) {
                     keyList.remove(key);
-                    Util.safeCloseFrame(remove);
+                    Utils.safeCloseFrame(remove);
                     System.out.println("[缓存帧超时:丢弃]："+key);
                 }
             }else{

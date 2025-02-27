@@ -1,6 +1,6 @@
 package com.saigou.thread;
 
-import com.saigou.util.Util;
+import com.saigou.util.Utils;
 import lombok.SneakyThrows;
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.Frame;
@@ -32,12 +32,12 @@ public class PullStreamThread extends Thread {
         Frame frame;
         while (!isInterrupted() && (frame = grabber.grab()) != null) {
             if (frame.image != null) {
-                Frame clonedFrame = Util.createDeepCopy(frame);
+                Frame clonedFrame = Utils.createDeepCopy(frame);
                 if (frameQueue.remainingCapacity() > 10) {
                     frameQueue.offer(clonedFrame);
                 } else {
                     Frame oldFrame = frameQueue.poll();
-                    Util.safeCloseFrame(oldFrame);
+                    Utils.safeCloseFrame(oldFrame);
                     frameQueue.offer(clonedFrame);
                 }
                 // 控制日志频率，每30帧打印一次
