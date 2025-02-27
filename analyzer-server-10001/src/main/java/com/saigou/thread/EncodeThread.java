@@ -52,7 +52,7 @@ public class EncodeThread extends Thread{
              Size newSize = new Size(mat.cols() / 2, mat.rows() / 2);) {
             opencv_imgproc.resize(mat, resizedMat, newSize);
             ByteString bytes = encodeJpeg(resizedMat);
-            ImageWrapper wrapper = new ImageWrapper(bytes, frame.timestamp);
+            ImageWrapper wrapper = new ImageWrapper(bytes, frame.timestamp, mat.cols(), mat.rows());
             keyList.add(frame.timestamp);
             if (imageQueue.remainingCapacity() > 10) { // 保持缓冲余量
                 imageQueue.offer(wrapper);

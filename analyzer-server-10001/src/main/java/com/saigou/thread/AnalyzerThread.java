@@ -45,8 +45,8 @@ public class AnalyzerThread extends Thread implements StreamObserver<AnalysisRes
                             .setImageData(wrapper.imageData)
                             .setTimestamp(wrapper.timestamp)
                             .setAlgorithmsType(0)
-                            .setHeight(1080)
-                            .setWidth(1920)
+                            .setHeight(wrapper.imageHeight)
+                            .setWidth(wrapper.imageWidth)
                             .build();
                     requestObserver.onNext(videoFrame);
                 }

@@ -10,8 +10,7 @@ import static org.bytedeco.ffmpeg.global.avutil.av_frame_unref;
 public class Util {
     public static Frame createDeepCopy(Frame frame) {
         Frame clonedFrame = new Frame();
-        clonedFrame.image = frame.image.clone(); // 显式复制图像数据
-        clonedFrame.timestamp = frame.timestamp;
+        clonedFrame = frame.clone();
         return clonedFrame;
     }
 
