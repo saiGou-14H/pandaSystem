@@ -2,6 +2,7 @@ package com.saigou.thread;
 
 import com.google.protobuf.ByteString;
 import com.saigou.draw.Draw;
+import com.saigou.entity.FrameWrapper;
 import com.saigou.entity.ImageWrapper;
 import com.saigou.grpc.*;
 import io.grpc.ManagedChannel;
@@ -13,19 +14,20 @@ import org.bytedeco.opencv.opencv_core.Mat;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 
 import static com.saigou.thread.EncodeThread.dencodeJpeg;
 public class AnalyzerThread extends Thread implements StreamObserver<AnalysisResult> {
     public LinkedBlockingQueue<ImageWrapper> imageQueue;
-    public ConcurrentSkipListMap<Long,Frame> resultCache;
+    public ConcurrentSkipListMap<Long, FrameWrapper> resultCache;
     public final ManagedChannel channel;
     public final VideoProcessorGrpc.VideoProcessorStub stub;
     public StreamObserver<VideoFrame> requestObserver;
     private final ExecutorService frameProcessorExecutor = Executors.newFixedThreadPool(16);
     public OpenCVFrameConverter.ToMat converter;
-    public AnalyzerThread(LinkedBlockingQueue<ImageWrapper> imageQueue, ConcurrentSkipListMap<Long,Frame> resultCache){
+    public AnalyzerThread(LinkedBlockingQueue<ImageWrapper> imageQueue, ConcurrentSkipListMap<Long,FrameWrapper> resultCache){
         this.resultCache = resultCache;
         this.imageQueue = imageQueue;
         channel = ManagedChannelBuilder.forAddress("localhost", 50051)
@@ -68,18 +70,23 @@ public class AnalyzerThread extends Thread implements StreamObserver<AnalysisRes
             try {
                 // jpeg解码
                 frameProcessorExecutor.submit(() -> {
-                    Mat mat = dencodeJpeg(imageData);//释放该资源会导致帧顺序错误
-                    List<FaceBox> faceBoxes = analysisResult.getFaceBoxesList();
-                    List<PersonBox> expressions = analysisResult.getPersonBoxesList();
-                    long start = System.currentTimeMillis();
-                    for (FaceBox faceBox : faceBoxes) {
-                        Draw.drawRectangle(mat, faceBox.getMinPoint(), faceBox.getMaxPoint());
-                        Draw.drawText(mat, faceBox.getExpressionFeature(), faceBox.getMinPoint());
+                    if(!analysisResult.getFaceBoxesList().isEmpty() && !analysisResult.getPersonBoxesList().isEmpty()){
+                        Mat mat = dencodeJpeg(imageData);//释放该资源会导致帧顺序错误
+                        List<FaceBox> faceBoxes = analysisResult.getFaceBoxesList();
+                        List<PersonBox> expressions = analysisResult.getPersonBoxesList();
+                        for (FaceBox faceBox : faceBoxes) {
+                            Draw.drawRectangle(mat, faceBox.getMinPoint(), faceBox.getMaxPoint());
+                            Draw.drawText(mat, faceBox.getExpressionFeature(), faceBox.getMinPoint());
+                        }
+                        for (PersonBox personBox : expressions) {
+                            List<Point> points = personBox.getPointsList();
+                            Draw.drawPersonPose(mat, points);
+                        }
+                        Frame frame = converter.convert(mat);
+                        frame.timestamp = analysisResult.getTimestamp();
+                        FrameWrapper frameWrapper = new FrameWrapper(frame, faceBoxes, expressions);
+                        resultCache.put(frame.timestamp, frameWrapper);
                     }
-                    System.out.println("耗时：" + (System.currentTimeMillis() - start));
-                    Frame frame = converter.convert(mat);
-                    frame.timestamp = analysisResult.getTimestamp();
-                    resultCache.put(frame.timestamp, frame);
                 });
             } catch (Exception e) {
                 System.out.println("处理图像时出错: " + e.getMessage());

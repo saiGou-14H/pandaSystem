@@ -1,19 +1,26 @@
 package com.saigou.thread;
 
+import com.saigou.draw.Draw;
+import com.saigou.entity.FrameWrapper;
+import com.saigou.grpc.FaceBox;
+import com.saigou.grpc.PersonBox;
+import com.saigou.grpc.Point;
 import com.saigou.util.Utils;
 import lombok.SneakyThrows;
 import org.bytedeco.ffmpeg.global.avcodec;
 import org.bytedeco.javacv.*;
 import org.bytedeco.opencv.global.opencv_core;
+import org.bytedeco.opencv.opencv_core.Mat;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.*;
 
 public class PushStreamThread extends Thread{
     public FFmpegFrameGrabber grabber;
     public FFmpegFrameRecorder recorder;
     public LinkedBlockingQueue<Frame> pushFrameQueue;
-    public ConcurrentSkipListMap<Long, Frame> resultCache;
+    public ConcurrentSkipListMap<Long, FrameWrapper> resultCache;
     public CopyOnWriteArrayList<Long> keyList;
     // 新增流量控制属性
     private final Semaphore semaphore = new Semaphore(30);  // 限制每秒最多30帧
@@ -21,7 +28,7 @@ public class PushStreamThread extends Thread{
 
 
     @SneakyThrows
-    public PushStreamThread(String url, FFmpegFrameGrabber grabber, LinkedBlockingQueue<Frame> pushFrameQueue, ConcurrentSkipListMap<Long, Frame> resultCache,CopyOnWriteArrayList<Long> keyList) {
+    public PushStreamThread(String url, FFmpegFrameGrabber grabber, LinkedBlockingQueue<Frame> pushFrameQueue, ConcurrentSkipListMap<Long, FrameWrapper> resultCache, CopyOnWriteArrayList<Long> keyList) {
         this.resultCache = resultCache;
         this.grabber = grabber;
         this.pushFrameQueue = pushFrameQueue;
@@ -63,10 +70,11 @@ public class PushStreamThread extends Thread{
 
 
 
+    public OpenCVFrameConverter.ToMat converter = new OpenCVFrameConverter.ToMat();
 
     @SneakyThrows
     public void run(){
-        final long MAX_WAIT_MS = (long) ((1000/recorder.getFrameRate())-10); // 最大等待结果时间
+        final long MAX_WAIT_MS = (long) ((1000/recorder.getFrameRate())-10-5); // 最大等待结果时间
         System.out.println("最大延迟："+MAX_WAIT_MS+"ms");
         long startTime = System.currentTimeMillis();
         int frameCount = 0;
@@ -75,6 +83,8 @@ public class PushStreamThread extends Thread{
             Thread.sleep(20); // 避免持续轮询，减少 CPU 占用
         }
         long oldtimestamp=-1;
+        List<FaceBox> faceBoxList= null;
+        List<PersonBox> personBoxList= null;
         while (!isInterrupted()) {
             Frame frame = pushFrameQueue.poll(5, TimeUnit.MILLISECONDS);
             if(frame != null && frame.timestamp <= oldtimestamp){
@@ -84,20 +94,33 @@ public class PushStreamThread extends Thread{
                 //等待对应分析结果
                 long startWait = System.currentTimeMillis();
                 while (System.currentTimeMillis() - startWait < MAX_WAIT_MS) {
-                    Frame result = resultCache.get(frame.timestamp);
+                    FrameWrapper result = resultCache.get(frame.timestamp);
                     if (result != null) break;
                 }
                 // 获取并处理结果
-                Frame result = CacheFrameHandler(frame.timestamp);
+                FrameWrapper result = CacheFrameHandler(frame.timestamp);
                 if (result != null) {
-                    recorder.record(result);
-                    oldtimestamp=result.timestamp;
-                    Utils.safeCloseFrame(result);
+                    faceBoxList = result.faceBoxes;
+                    personBoxList = result.faceBoxList;
+                    recorder.record(result.frame);
+                    oldtimestamp=result.frame.timestamp;
+                    Utils.safeCloseFrame(result.frame);
                 } else {
+                    if(faceBoxList!=null&&personBoxList!=null){// 用上一次分析结果绘制人脸框和人体关键点
+                        Mat mat = converter.convert(frame);
+                        for (FaceBox faceBox : faceBoxList) {
+                            Draw.drawRectangle(mat, faceBox.getMinPoint(), faceBox.getMaxPoint());
+                            Draw.drawText(mat, faceBox.getExpressionFeature(), faceBox.getMinPoint());
+                        }
+                        for (PersonBox personBox : personBoxList) {
+                            List<Point> points = personBox.getPointsList();
+                            Draw.drawPersonPose(mat, points);
+                        }
+                        frame = converter.convert(mat);
+                    }
                     recorder.record(frame);
                     oldtimestamp=frame.timestamp;
                 }
-
                 frameCount++;
                 // 每 5 秒输出一次帧率
                 if (System.currentTimeMillis() - startTime > 5000) {
@@ -111,7 +134,7 @@ public class PushStreamThread extends Thread{
         }
     }
 
-    private Frame CacheFrameHandler(long timestamp) throws InterruptedException {
+    private FrameWrapper CacheFrameHandler(long timestamp) throws InterruptedException {
         Long key;
         Iterator<Long> list = keyList.iterator();
         while (list.hasNext()){
@@ -120,10 +143,10 @@ public class PushStreamThread extends Thread{
                 return resultCache.remove(timestamp);
             }
             if (key<timestamp){
-                Frame remove = resultCache.remove(key);
+                FrameWrapper remove = resultCache.remove(key);
                 if (remove != null) {
                     keyList.remove(key);
-                    Utils.safeCloseFrame(remove);
+                    Utils.safeCloseFrame(remove.frame);
                     System.out.println("[缓存帧超时:丢弃]："+key);
                 }
             }else{
