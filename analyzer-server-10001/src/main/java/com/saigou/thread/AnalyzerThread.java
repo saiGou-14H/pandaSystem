@@ -70,23 +70,27 @@ public class AnalyzerThread extends Thread implements StreamObserver<AnalysisRes
             try {
                 // jpeg解码
                 frameProcessorExecutor.submit(() -> {
-                    if(!analysisResult.getFaceBoxesList().isEmpty() && !analysisResult.getPersonBoxesList().isEmpty()){
-                        Mat mat = dencodeJpeg(imageData);//释放该资源会导致帧顺序错误
-                        List<FaceBox> faceBoxes = analysisResult.getFaceBoxesList();
-                        List<PersonBox> expressions = analysisResult.getPersonBoxesList();
+                    Mat mat = dencodeJpeg(imageData);//释放该资源会导致帧顺序错误
+                    List<FaceBox> faceBoxes = null;
+                    List<PersonBox> expressions = null;
+                    if(!analysisResult.getFaceBoxesList().isEmpty()){
+                        faceBoxes = analysisResult.getFaceBoxesList();
                         for (FaceBox faceBox : faceBoxes) {
                             Draw.drawRectangle(mat, faceBox.getMinPoint(), faceBox.getMaxPoint());
                             Draw.drawText(mat, faceBox.getExpressionFeature(), faceBox.getMinPoint());
                         }
+                    }
+                    if(!analysisResult.getPersonBoxesList().isEmpty()){
+                        expressions = analysisResult.getPersonBoxesList();
                         for (PersonBox personBox : expressions) {
                             List<Point> points = personBox.getPointsList();
                             Draw.drawPersonPose(mat, points);
                         }
-                        Frame frame = converter.convert(mat);
-                        frame.timestamp = analysisResult.getTimestamp();
-                        FrameWrapper frameWrapper = new FrameWrapper(frame, faceBoxes, expressions);
-                        resultCache.put(frame.timestamp, frameWrapper);
                     }
+                    Frame frame = converter.convert(mat);
+                    frame.timestamp = analysisResult.getTimestamp();
+                    FrameWrapper frameWrapper = new FrameWrapper(frame, faceBoxes, expressions);
+                    resultCache.put(frame.timestamp, frameWrapper);
                 });
             } catch (Exception e) {
                 System.out.println("处理图像时出错: " + e.getMessage());

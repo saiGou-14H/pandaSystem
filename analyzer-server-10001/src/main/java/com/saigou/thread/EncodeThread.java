@@ -67,7 +67,7 @@ public class EncodeThread extends Thread{
         }
     }
 
-    int count = 10;
+    int count = 15;
     int frameCount = 0;
     @Override
     public void run() {

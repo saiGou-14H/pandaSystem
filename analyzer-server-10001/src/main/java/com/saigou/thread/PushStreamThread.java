@@ -106,18 +106,23 @@ public class PushStreamThread extends Thread{
                     oldtimestamp=result.frame.timestamp;
                     Utils.safeCloseFrame(result.frame);
                 } else {
-                    if(faceBoxList!=null&&personBoxList!=null){// 用上一次分析结果绘制人脸框和人体关键点
+                    if(faceBoxList!=null||personBoxList!=null){// 用上一次分析结果绘制人脸框和人体关键点
                         Mat mat = converter.convert(frame);
-                        for (FaceBox faceBox : faceBoxList) {
-                            Draw.drawRectangle(mat, faceBox.getMinPoint(), faceBox.getMaxPoint());
-                            Draw.drawText(mat, faceBox.getExpressionFeature(), faceBox.getMinPoint());
+                        if(faceBoxList!=null){
+                            for (FaceBox faceBox : faceBoxList) {
+                                Draw.drawRectangle(mat, faceBox.getMinPoint(), faceBox.getMaxPoint());
+                                Draw.drawText(mat, faceBox.getExpressionFeature(), faceBox.getMinPoint());
+                            }
                         }
-                        for (PersonBox personBox : personBoxList) {
-                            List<Point> points = personBox.getPointsList();
-                            Draw.drawPersonPose(mat, points);
+                        if(personBoxList!=null){
+                            for (PersonBox personBox : personBoxList) {
+                                List<Point> points = personBox.getPointsList();
+                                Draw.drawPersonPose(mat, points);
+                            }
                         }
                         frame = converter.convert(mat);
                     }
+
                     recorder.record(frame);
                     oldtimestamp=frame.timestamp;
                 }

@@ -25,7 +25,7 @@ public class Processor {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        String url1 = "rtsp://127.0.0.1:7554/live/30";
+        String url1 = "rtsp://127.0.0.1:7554/live/30-2";
         String url2 = "rtmp://127.0.0.1:7935/live/test3";
         videoStreamProcessor videoStreamProcessor = new videoStreamProcessor(url1, url2);
         videoStreamProcessor.start();
