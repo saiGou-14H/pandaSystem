@@ -36,10 +36,25 @@ public final class VideoProto {
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_AnalysisResult_fieldAccessorTable;
   static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_BoundingBox_descriptor;
+    internal_static_FaceBox_descriptor;
   static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_BoundingBox_fieldAccessorTable;
+      internal_static_FaceBox_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_PersonBox_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_PersonBox_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_Point_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_Point_fieldAccessorTable;
+  static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_Algorithm_descriptor;
+  static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_Algorithm_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -49,18 +64,28 @@ public final class VideoProto {
       descriptor;
   static {
     String[] descriptorData = {
-      "\n\013video.proto\"k\n\nVideoFrame\022\022\n\nimage_dat" +
-      "a\030\001 \001(\014\022\021\n\ttimestamp\030\002 \001(\003\022\027\n\017algorithms" +
-      "_type\030\003 \001(\003\022\016\n\006height\030\004 \001(\003\022\r\n\005width\030\005 \001" +
-      "(\003\"b\n\016AnalysisResult\022\021\n\ttimestamp\030\001 \001(\003\022" +
-      "\033\n\005boxes\030\002 \003(\0132\014.BoundingBox\022\014\n\004data\030\003 \001" +
-      "(\t\022\022\n\nimage_data\030\004 \001(\014\"\200\001\n\013BoundingBox\022\r" +
-      "\n\005label\030\001 \001(\t\022\t\n\001x\030\002 \001(\003\022\t\n\001y\030\003 \001(\003\022\r\n\005w" +
-      "idth\030\004 \001(\003\022\016\n\006height\030\005 \001(\003\022\r\n\005score\030\006 \001(" +
-      "\002\022\020\n\010track_id\030\007 \001(\t\022\014\n\004data\030\010 \001(\t2B\n\016Vid" +
-      "eoProcessor\0220\n\014ProcessFrame\022\013.VideoFrame" +
-      "\032\017.AnalysisResult(\0010\001B\037\n\017com.saigou.grpc" +
-      "B\nVideoProtoP\001b\006proto3"
+      "\n\013video.proto\"r\n\nVideoFrame\022\022\n\nimage_dat" +
+      "a\030\001 \001(\014\022\021\n\ttimestamp\030\002 \001(\003\022\036\n\nalgorithms" +
+      "\030\003 \003(\0132\n.Algorithm\022\016\n\006height\030\004 \001(\003\022\r\n\005wi" +
+      "dth\030\005 \001(\003\"\205\001\n\016AnalysisResult\022\021\n\ttimestam" +
+      "p\030\001 \001(\003\022\034\n\nface_boxes\030\002 \003(\0132\010.FaceBox\022 \n" +
+      "\014person_boxes\030\003 \003(\0132\n.PersonBox\022\014\n\004data\030" +
+      "\004 \001(\t\022\022\n\nimage_data\030\005 \001(\014\"\277\001\n\007FaceBox\022\r\n" +
+      "\005label\030\001 \001(\t\022\030\n\010minPoint\030\002 \001(\0132\006.Point\022\030" +
+      "\n\010maxPoint\030\003 \001(\0132\006.Point\022\r\n\005score\030\004 \001(\002\022" +
+      "\020\n\010track_id\030\005 \001(\003\022\017\n\007face_id\030\006 \001(\003\022\025\n\rex" +
+      "pression_id\030\007 \001(\003\022\032\n\022expression_feature\030" +
+      "\010 \001(\t\022\014\n\004data\030\t \001(\t\"\304\001\n\tPersonBox\022\r\n\005lab" +
+      "el\030\001 \001(\t\022\030\n\010minPoint\030\002 \001(\0132\006.Point\022\030\n\010ma" +
+      "xPoint\030\003 \001(\0132\006.Point\022\026\n\006points\030\004 \003(\0132\006.P" +
+      "oint\022\r\n\005score\030\005 \001(\002\022\020\n\010track_id\030\006 \001(\003\022\023\n" +
+      "\013attitude_id\030\007 \001(\003\022\030\n\020attitude_feature\030\010" +
+      " \001(\t\022\014\n\004data\030\t \001(\t\"\035\n\005Point\022\t\n\001x\030\001 \001(\002\022\t" +
+      "\n\001y\030\002 \001(\002\"5\n\tAlgorithm\022\014\n\004type\030\001 \001(\003\022\014\n\004" +
+      "name\030\002 \001(\t\022\014\n\004data\030\003 \001(\t2B\n\016VideoProcess" +
+      "or\0220\n\014ProcessFrame\022\013.VideoFrame\032\017.Analys" +
+      "isResult(\0010\001B\037\n\017com.saigou.grpcB\nVideoPr" +
+      "otoP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -71,19 +96,37 @@ public final class VideoProto {
     internal_static_VideoFrame_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_VideoFrame_descriptor,
-        new String[] { "ImageData", "Timestamp", "AlgorithmsType", "Height", "Width", });
+        new String[] { "ImageData", "Timestamp", "Algorithms", "Height", "Width", });
     internal_static_AnalysisResult_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_AnalysisResult_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_AnalysisResult_descriptor,
-        new String[] { "Timestamp", "Boxes", "Data", "ImageData", });
-    internal_static_BoundingBox_descriptor =
+        new String[] { "Timestamp", "FaceBoxes", "PersonBoxes", "Data", "ImageData", });
+    internal_static_FaceBox_descriptor =
       getDescriptor().getMessageTypes().get(2);
-    internal_static_BoundingBox_fieldAccessorTable = new
+    internal_static_FaceBox_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_BoundingBox_descriptor,
-        new String[] { "Label", "X", "Y", "Width", "Height", "Score", "TrackId", "Data", });
+        internal_static_FaceBox_descriptor,
+        new String[] { "Label", "MinPoint", "MaxPoint", "Score", "TrackId", "FaceId", "ExpressionId", "ExpressionFeature", "Data", });
+    internal_static_PersonBox_descriptor =
+      getDescriptor().getMessageTypes().get(3);
+    internal_static_PersonBox_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_PersonBox_descriptor,
+        new String[] { "Label", "MinPoint", "MaxPoint", "Points", "Score", "TrackId", "AttitudeId", "AttitudeFeature", "Data", });
+    internal_static_Point_descriptor =
+      getDescriptor().getMessageTypes().get(4);
+    internal_static_Point_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_Point_descriptor,
+        new String[] { "X", "Y", });
+    internal_static_Algorithm_descriptor =
+      getDescriptor().getMessageTypes().get(5);
+    internal_static_Algorithm_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_Algorithm_descriptor,
+        new String[] { "Type", "Name", "Data", });
     descriptor.resolveAllFeaturesImmutable();
   }
 

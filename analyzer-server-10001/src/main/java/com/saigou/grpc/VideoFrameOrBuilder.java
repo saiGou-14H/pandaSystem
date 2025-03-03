@@ -34,10 +34,44 @@ public interface VideoFrameOrBuilder extends
    * 算法类别
    * </pre>
    *
-   * <code>int64 algorithms_type = 3;</code>
-   * @return The algorithmsType.
+   * <code>repeated .Algorithm algorithms = 3;</code>
    */
-  long getAlgorithmsType();
+  java.util.List<Algorithm>
+      getAlgorithmsList();
+  /**
+   * <pre>
+   * 算法类别
+   * </pre>
+   *
+   * <code>repeated .Algorithm algorithms = 3;</code>
+   */
+  Algorithm getAlgorithms(int index);
+  /**
+   * <pre>
+   * 算法类别
+   * </pre>
+   *
+   * <code>repeated .Algorithm algorithms = 3;</code>
+   */
+  int getAlgorithmsCount();
+  /**
+   * <pre>
+   * 算法类别
+   * </pre>
+   *
+   * <code>repeated .Algorithm algorithms = 3;</code>
+   */
+  java.util.List<? extends AlgorithmOrBuilder>
+      getAlgorithmsOrBuilderList();
+  /**
+   * <pre>
+   * 算法类别
+   * </pre>
+   *
+   * <code>repeated .Algorithm algorithms = 3;</code>
+   */
+  AlgorithmOrBuilder getAlgorithmsOrBuilder(
+      int index);
 
   /**
    * <pre>

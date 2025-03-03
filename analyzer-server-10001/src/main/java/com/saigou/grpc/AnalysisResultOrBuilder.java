@@ -24,43 +24,67 @@ public interface AnalysisResultOrBuilder extends
    * 检测框
    * </pre>
    *
-   * <code>repeated .BoundingBox boxes = 2;</code>
+   * <code>repeated .FaceBox face_boxes = 2;</code>
    */
-  java.util.List<BoundingBox>
-      getBoxesList();
+  java.util.List<FaceBox>
+      getFaceBoxesList();
   /**
    * <pre>
    * 检测框
    * </pre>
    *
-   * <code>repeated .BoundingBox boxes = 2;</code>
+   * <code>repeated .FaceBox face_boxes = 2;</code>
    */
-  BoundingBox getBoxes(int index);
+  FaceBox getFaceBoxes(int index);
   /**
    * <pre>
    * 检测框
    * </pre>
    *
-   * <code>repeated .BoundingBox boxes = 2;</code>
+   * <code>repeated .FaceBox face_boxes = 2;</code>
    */
-  int getBoxesCount();
+  int getFaceBoxesCount();
   /**
    * <pre>
    * 检测框
    * </pre>
    *
-   * <code>repeated .BoundingBox boxes = 2;</code>
+   * <code>repeated .FaceBox face_boxes = 2;</code>
    */
-  java.util.List<? extends BoundingBoxOrBuilder>
-      getBoxesOrBuilderList();
+  java.util.List<? extends FaceBoxOrBuilder>
+      getFaceBoxesOrBuilderList();
   /**
    * <pre>
    * 检测框
    * </pre>
    *
-   * <code>repeated .BoundingBox boxes = 2;</code>
+   * <code>repeated .FaceBox face_boxes = 2;</code>
    */
-  BoundingBoxOrBuilder getBoxesOrBuilder(
+  FaceBoxOrBuilder getFaceBoxesOrBuilder(
+      int index);
+
+  /**
+   * <code>repeated .PersonBox person_boxes = 3;</code>
+   */
+  java.util.List<PersonBox>
+      getPersonBoxesList();
+  /**
+   * <code>repeated .PersonBox person_boxes = 3;</code>
+   */
+  PersonBox getPersonBoxes(int index);
+  /**
+   * <code>repeated .PersonBox person_boxes = 3;</code>
+   */
+  int getPersonBoxesCount();
+  /**
+   * <code>repeated .PersonBox person_boxes = 3;</code>
+   */
+  java.util.List<? extends PersonBoxOrBuilder>
+      getPersonBoxesOrBuilderList();
+  /**
+   * <code>repeated .PersonBox person_boxes = 3;</code>
+   */
+  PersonBoxOrBuilder getPersonBoxesOrBuilder(
       int index);
 
   /**
@@ -68,7 +92,7 @@ public interface AnalysisResultOrBuilder extends
    * 算法返回数据
    * </pre>
    *
-   * <code>string data = 3;</code>
+   * <code>string data = 4;</code>
    * @return The data.
    */
   String getData();
@@ -77,14 +101,14 @@ public interface AnalysisResultOrBuilder extends
    * 算法返回数据
    * </pre>
    *
-   * <code>string data = 3;</code>
+   * <code>string data = 4;</code>
    * @return The bytes for data.
    */
   com.google.protobuf.ByteString
       getDataBytes();
 
   /**
-   * <code>bytes image_data = 4;</code>
+   * <code>bytes image_data = 5;</code>
    * @return The imageData.
    */
   com.google.protobuf.ByteString getImageData();

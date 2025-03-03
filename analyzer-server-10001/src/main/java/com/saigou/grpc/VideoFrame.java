@@ -11,7 +11,7 @@ package com.saigou.grpc;
 public final class VideoFrame extends
     com.google.protobuf.GeneratedMessage implements
     // @@protoc_insertion_point(message_implements:VideoFrame)
-        VideoFrameOrBuilder {
+    VideoFrameOrBuilder {
 private static final long serialVersionUID = 0L;
   static {
     com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
@@ -28,6 +28,7 @@ private static final long serialVersionUID = 0L;
   }
   private VideoFrame() {
     imageData_ = com.google.protobuf.ByteString.EMPTY;
+    algorithms_ = java.util.Collections.emptyList();
   }
 
   public static final com.google.protobuf.Descriptors.Descriptor
@@ -40,7 +41,7 @@ private static final long serialVersionUID = 0L;
       internalGetFieldAccessorTable() {
     return VideoProto.internal_static_VideoFrame_fieldAccessorTable
         .ensureFieldAccessorsInitialized(
-            VideoFrame.class, VideoFrame.Builder.class);
+            VideoFrame.class, Builder.class);
   }
 
   public static final int IMAGE_DATA_FIELD_NUMBER = 1;
@@ -73,19 +74,65 @@ private static final long serialVersionUID = 0L;
     return timestamp_;
   }
 
-  public static final int ALGORITHMS_TYPE_FIELD_NUMBER = 3;
-  private long algorithmsType_ = 0L;
+  public static final int ALGORITHMS_FIELD_NUMBER = 3;
+  @SuppressWarnings("serial")
+  private java.util.List<Algorithm> algorithms_;
   /**
    * <pre>
    * 算法类别
    * </pre>
    *
-   * <code>int64 algorithms_type = 3;</code>
-   * @return The algorithmsType.
+   * <code>repeated .Algorithm algorithms = 3;</code>
    */
   @Override
-  public long getAlgorithmsType() {
-    return algorithmsType_;
+  public java.util.List<Algorithm> getAlgorithmsList() {
+    return algorithms_;
+  }
+  /**
+   * <pre>
+   * 算法类别
+   * </pre>
+   *
+   * <code>repeated .Algorithm algorithms = 3;</code>
+   */
+  @Override
+  public java.util.List<? extends AlgorithmOrBuilder>
+      getAlgorithmsOrBuilderList() {
+    return algorithms_;
+  }
+  /**
+   * <pre>
+   * 算法类别
+   * </pre>
+   *
+   * <code>repeated .Algorithm algorithms = 3;</code>
+   */
+  @Override
+  public int getAlgorithmsCount() {
+    return algorithms_.size();
+  }
+  /**
+   * <pre>
+   * 算法类别
+   * </pre>
+   *
+   * <code>repeated .Algorithm algorithms = 3;</code>
+   */
+  @Override
+  public Algorithm getAlgorithms(int index) {
+    return algorithms_.get(index);
+  }
+  /**
+   * <pre>
+   * 算法类别
+   * </pre>
+   *
+   * <code>repeated .Algorithm algorithms = 3;</code>
+   */
+  @Override
+  public AlgorithmOrBuilder getAlgorithmsOrBuilder(
+      int index) {
+    return algorithms_.get(index);
   }
 
   public static final int HEIGHT_FIELD_NUMBER = 4;
@@ -138,8 +185,8 @@ private static final long serialVersionUID = 0L;
     if (timestamp_ != 0L) {
       output.writeInt64(2, timestamp_);
     }
-    if (algorithmsType_ != 0L) {
-      output.writeInt64(3, algorithmsType_);
+    for (int i = 0; i < algorithms_.size(); i++) {
+      output.writeMessage(3, algorithms_.get(i));
     }
     if (height_ != 0L) {
       output.writeInt64(4, height_);
@@ -164,9 +211,9 @@ private static final long serialVersionUID = 0L;
       size += com.google.protobuf.CodedOutputStream
         .computeInt64Size(2, timestamp_);
     }
-    if (algorithmsType_ != 0L) {
+    for (int i = 0; i < algorithms_.size(); i++) {
       size += com.google.protobuf.CodedOutputStream
-        .computeInt64Size(3, algorithmsType_);
+        .computeMessageSize(3, algorithms_.get(i));
     }
     if (height_ != 0L) {
       size += com.google.protobuf.CodedOutputStream
@@ -195,8 +242,8 @@ private static final long serialVersionUID = 0L;
         .equals(other.getImageData())) return false;
     if (getTimestamp()
         != other.getTimestamp()) return false;
-    if (getAlgorithmsType()
-        != other.getAlgorithmsType()) return false;
+    if (!getAlgorithmsList()
+        .equals(other.getAlgorithmsList())) return false;
     if (getHeight()
         != other.getHeight()) return false;
     if (getWidth()
@@ -217,9 +264,10 @@ private static final long serialVersionUID = 0L;
     hash = (37 * hash) + TIMESTAMP_FIELD_NUMBER;
     hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
         getTimestamp());
-    hash = (37 * hash) + ALGORITHMS_TYPE_FIELD_NUMBER;
-    hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
-        getAlgorithmsType());
+    if (getAlgorithmsCount() > 0) {
+      hash = (37 * hash) + ALGORITHMS_FIELD_NUMBER;
+      hash = (53 * hash) + getAlgorithmsList().hashCode();
+    }
     hash = (37 * hash) + HEIGHT_FIELD_NUMBER;
     hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
         getHeight());
@@ -329,7 +377,7 @@ private static final long serialVersionUID = 0L;
   public static final class Builder extends
       com.google.protobuf.GeneratedMessage.Builder<Builder> implements
       // @@protoc_insertion_point(builder_implements:VideoFrame)
-          VideoFrameOrBuilder {
+      VideoFrameOrBuilder {
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
       return VideoProto.internal_static_VideoFrame_descriptor;
@@ -340,7 +388,7 @@ private static final long serialVersionUID = 0L;
         internalGetFieldAccessorTable() {
       return VideoProto.internal_static_VideoFrame_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              VideoFrame.class, VideoFrame.Builder.class);
+              VideoFrame.class, Builder.class);
     }
 
     // Construct using com.saigou.grpc.VideoFrame.newBuilder()
@@ -359,7 +407,13 @@ private static final long serialVersionUID = 0L;
       bitField0_ = 0;
       imageData_ = com.google.protobuf.ByteString.EMPTY;
       timestamp_ = 0L;
-      algorithmsType_ = 0L;
+      if (algorithmsBuilder_ == null) {
+        algorithms_ = java.util.Collections.emptyList();
+      } else {
+        algorithms_ = null;
+        algorithmsBuilder_.clear();
+      }
+      bitField0_ = (bitField0_ & ~0x00000004);
       height_ = 0L;
       width_ = 0L;
       return this;
@@ -388,9 +442,22 @@ private static final long serialVersionUID = 0L;
     @Override
     public VideoFrame buildPartial() {
       VideoFrame result = new VideoFrame(this);
+      buildPartialRepeatedFields(result);
       if (bitField0_ != 0) { buildPartial0(result); }
       onBuilt();
       return result;
+    }
+
+    private void buildPartialRepeatedFields(VideoFrame result) {
+      if (algorithmsBuilder_ == null) {
+        if (((bitField0_ & 0x00000004) != 0)) {
+          algorithms_ = java.util.Collections.unmodifiableList(algorithms_);
+          bitField0_ = (bitField0_ & ~0x00000004);
+        }
+        result.algorithms_ = algorithms_;
+      } else {
+        result.algorithms_ = algorithmsBuilder_.build();
+      }
     }
 
     private void buildPartial0(VideoFrame result) {
@@ -400,9 +467,6 @@ private static final long serialVersionUID = 0L;
       }
       if (((from_bitField0_ & 0x00000002) != 0)) {
         result.timestamp_ = timestamp_;
-      }
-      if (((from_bitField0_ & 0x00000004) != 0)) {
-        result.algorithmsType_ = algorithmsType_;
       }
       if (((from_bitField0_ & 0x00000008) != 0)) {
         result.height_ = height_;
@@ -430,8 +494,31 @@ private static final long serialVersionUID = 0L;
       if (other.getTimestamp() != 0L) {
         setTimestamp(other.getTimestamp());
       }
-      if (other.getAlgorithmsType() != 0L) {
-        setAlgorithmsType(other.getAlgorithmsType());
+      if (algorithmsBuilder_ == null) {
+        if (!other.algorithms_.isEmpty()) {
+          if (algorithms_.isEmpty()) {
+            algorithms_ = other.algorithms_;
+            bitField0_ = (bitField0_ & ~0x00000004);
+          } else {
+            ensureAlgorithmsIsMutable();
+            algorithms_.addAll(other.algorithms_);
+          }
+          onChanged();
+        }
+      } else {
+        if (!other.algorithms_.isEmpty()) {
+          if (algorithmsBuilder_.isEmpty()) {
+            algorithmsBuilder_.dispose();
+            algorithmsBuilder_ = null;
+            algorithms_ = other.algorithms_;
+            bitField0_ = (bitField0_ & ~0x00000004);
+            algorithmsBuilder_ = 
+              com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                 getAlgorithmsFieldBuilder() : null;
+          } else {
+            algorithmsBuilder_.addAllMessages(other.algorithms_);
+          }
+        }
       }
       if (other.getHeight() != 0L) {
         setHeight(other.getHeight());
@@ -475,11 +562,19 @@ private static final long serialVersionUID = 0L;
               bitField0_ |= 0x00000002;
               break;
             } // case 16
-            case 24: {
-              algorithmsType_ = input.readInt64();
-              bitField0_ |= 0x00000004;
+            case 26: {
+              Algorithm m =
+                  input.readMessage(
+                      Algorithm.parser(),
+                      extensionRegistry);
+              if (algorithmsBuilder_ == null) {
+                ensureAlgorithmsIsMutable();
+                algorithms_.add(m);
+              } else {
+                algorithmsBuilder_.addMessage(m);
+              }
               break;
-            } // case 24
+            } // case 26
             case 32: {
               height_ = input.readInt64();
               bitField0_ |= 0x00000008;
@@ -595,33 +690,79 @@ private static final long serialVersionUID = 0L;
       return this;
     }
 
-    private long algorithmsType_ ;
-    /**
-     * <pre>
-     * 算法类别
-     * </pre>
-     *
-     * <code>int64 algorithms_type = 3;</code>
-     * @return The algorithmsType.
-     */
-    @Override
-    public long getAlgorithmsType() {
-      return algorithmsType_;
+    private java.util.List<Algorithm> algorithms_ =
+      java.util.Collections.emptyList();
+    private void ensureAlgorithmsIsMutable() {
+      if (!((bitField0_ & 0x00000004) != 0)) {
+        algorithms_ = new java.util.ArrayList<Algorithm>(algorithms_);
+        bitField0_ |= 0x00000004;
+       }
     }
-    /**
-     * <pre>
-     * 算法类别
-     * </pre>
-     *
-     * <code>int64 algorithms_type = 3;</code>
-     * @param value The algorithmsType to set.
-     * @return This builder for chaining.
-     */
-    public Builder setAlgorithmsType(long value) {
 
-      algorithmsType_ = value;
-      bitField0_ |= 0x00000004;
-      onChanged();
+    private com.google.protobuf.RepeatedFieldBuilder<
+        Algorithm, Algorithm.Builder, AlgorithmOrBuilder> algorithmsBuilder_;
+
+    /**
+     * <pre>
+     * 算法类别
+     * </pre>
+     *
+     * <code>repeated .Algorithm algorithms = 3;</code>
+     */
+    public java.util.List<Algorithm> getAlgorithmsList() {
+      if (algorithmsBuilder_ == null) {
+        return java.util.Collections.unmodifiableList(algorithms_);
+      } else {
+        return algorithmsBuilder_.getMessageList();
+      }
+    }
+    /**
+     * <pre>
+     * 算法类别
+     * </pre>
+     *
+     * <code>repeated .Algorithm algorithms = 3;</code>
+     */
+    public int getAlgorithmsCount() {
+      if (algorithmsBuilder_ == null) {
+        return algorithms_.size();
+      } else {
+        return algorithmsBuilder_.getCount();
+      }
+    }
+    /**
+     * <pre>
+     * 算法类别
+     * </pre>
+     *
+     * <code>repeated .Algorithm algorithms = 3;</code>
+     */
+    public Algorithm getAlgorithms(int index) {
+      if (algorithmsBuilder_ == null) {
+        return algorithms_.get(index);
+      } else {
+        return algorithmsBuilder_.getMessage(index);
+      }
+    }
+    /**
+     * <pre>
+     * 算法类别
+     * </pre>
+     *
+     * <code>repeated .Algorithm algorithms = 3;</code>
+     */
+    public Builder setAlgorithms(
+        int index, Algorithm value) {
+      if (algorithmsBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        ensureAlgorithmsIsMutable();
+        algorithms_.set(index, value);
+        onChanged();
+      } else {
+        algorithmsBuilder_.setMessage(index, value);
+      }
       return this;
     }
     /**
@@ -629,14 +770,236 @@ private static final long serialVersionUID = 0L;
      * 算法类别
      * </pre>
      *
-     * <code>int64 algorithms_type = 3;</code>
-     * @return This builder for chaining.
+     * <code>repeated .Algorithm algorithms = 3;</code>
      */
-    public Builder clearAlgorithmsType() {
-      bitField0_ = (bitField0_ & ~0x00000004);
-      algorithmsType_ = 0L;
-      onChanged();
+    public Builder setAlgorithms(
+        int index, Algorithm.Builder builderForValue) {
+      if (algorithmsBuilder_ == null) {
+        ensureAlgorithmsIsMutable();
+        algorithms_.set(index, builderForValue.build());
+        onChanged();
+      } else {
+        algorithmsBuilder_.setMessage(index, builderForValue.build());
+      }
       return this;
+    }
+    /**
+     * <pre>
+     * 算法类别
+     * </pre>
+     *
+     * <code>repeated .Algorithm algorithms = 3;</code>
+     */
+    public Builder addAlgorithms(Algorithm value) {
+      if (algorithmsBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        ensureAlgorithmsIsMutable();
+        algorithms_.add(value);
+        onChanged();
+      } else {
+        algorithmsBuilder_.addMessage(value);
+      }
+      return this;
+    }
+    /**
+     * <pre>
+     * 算法类别
+     * </pre>
+     *
+     * <code>repeated .Algorithm algorithms = 3;</code>
+     */
+    public Builder addAlgorithms(
+        int index, Algorithm value) {
+      if (algorithmsBuilder_ == null) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        ensureAlgorithmsIsMutable();
+        algorithms_.add(index, value);
+        onChanged();
+      } else {
+        algorithmsBuilder_.addMessage(index, value);
+      }
+      return this;
+    }
+    /**
+     * <pre>
+     * 算法类别
+     * </pre>
+     *
+     * <code>repeated .Algorithm algorithms = 3;</code>
+     */
+    public Builder addAlgorithms(
+        Algorithm.Builder builderForValue) {
+      if (algorithmsBuilder_ == null) {
+        ensureAlgorithmsIsMutable();
+        algorithms_.add(builderForValue.build());
+        onChanged();
+      } else {
+        algorithmsBuilder_.addMessage(builderForValue.build());
+      }
+      return this;
+    }
+    /**
+     * <pre>
+     * 算法类别
+     * </pre>
+     *
+     * <code>repeated .Algorithm algorithms = 3;</code>
+     */
+    public Builder addAlgorithms(
+        int index, Algorithm.Builder builderForValue) {
+      if (algorithmsBuilder_ == null) {
+        ensureAlgorithmsIsMutable();
+        algorithms_.add(index, builderForValue.build());
+        onChanged();
+      } else {
+        algorithmsBuilder_.addMessage(index, builderForValue.build());
+      }
+      return this;
+    }
+    /**
+     * <pre>
+     * 算法类别
+     * </pre>
+     *
+     * <code>repeated .Algorithm algorithms = 3;</code>
+     */
+    public Builder addAllAlgorithms(
+        Iterable<? extends Algorithm> values) {
+      if (algorithmsBuilder_ == null) {
+        ensureAlgorithmsIsMutable();
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(
+            values, algorithms_);
+        onChanged();
+      } else {
+        algorithmsBuilder_.addAllMessages(values);
+      }
+      return this;
+    }
+    /**
+     * <pre>
+     * 算法类别
+     * </pre>
+     *
+     * <code>repeated .Algorithm algorithms = 3;</code>
+     */
+    public Builder clearAlgorithms() {
+      if (algorithmsBuilder_ == null) {
+        algorithms_ = java.util.Collections.emptyList();
+        bitField0_ = (bitField0_ & ~0x00000004);
+        onChanged();
+      } else {
+        algorithmsBuilder_.clear();
+      }
+      return this;
+    }
+    /**
+     * <pre>
+     * 算法类别
+     * </pre>
+     *
+     * <code>repeated .Algorithm algorithms = 3;</code>
+     */
+    public Builder removeAlgorithms(int index) {
+      if (algorithmsBuilder_ == null) {
+        ensureAlgorithmsIsMutable();
+        algorithms_.remove(index);
+        onChanged();
+      } else {
+        algorithmsBuilder_.remove(index);
+      }
+      return this;
+    }
+    /**
+     * <pre>
+     * 算法类别
+     * </pre>
+     *
+     * <code>repeated .Algorithm algorithms = 3;</code>
+     */
+    public Algorithm.Builder getAlgorithmsBuilder(
+        int index) {
+      return getAlgorithmsFieldBuilder().getBuilder(index);
+    }
+    /**
+     * <pre>
+     * 算法类别
+     * </pre>
+     *
+     * <code>repeated .Algorithm algorithms = 3;</code>
+     */
+    public AlgorithmOrBuilder getAlgorithmsOrBuilder(
+        int index) {
+      if (algorithmsBuilder_ == null) {
+        return algorithms_.get(index);  } else {
+        return algorithmsBuilder_.getMessageOrBuilder(index);
+      }
+    }
+    /**
+     * <pre>
+     * 算法类别
+     * </pre>
+     *
+     * <code>repeated .Algorithm algorithms = 3;</code>
+     */
+    public java.util.List<? extends AlgorithmOrBuilder>
+         getAlgorithmsOrBuilderList() {
+      if (algorithmsBuilder_ != null) {
+        return algorithmsBuilder_.getMessageOrBuilderList();
+      } else {
+        return java.util.Collections.unmodifiableList(algorithms_);
+      }
+    }
+    /**
+     * <pre>
+     * 算法类别
+     * </pre>
+     *
+     * <code>repeated .Algorithm algorithms = 3;</code>
+     */
+    public Algorithm.Builder addAlgorithmsBuilder() {
+      return getAlgorithmsFieldBuilder().addBuilder(
+          Algorithm.getDefaultInstance());
+    }
+    /**
+     * <pre>
+     * 算法类别
+     * </pre>
+     *
+     * <code>repeated .Algorithm algorithms = 3;</code>
+     */
+    public Algorithm.Builder addAlgorithmsBuilder(
+        int index) {
+      return getAlgorithmsFieldBuilder().addBuilder(
+          index, Algorithm.getDefaultInstance());
+    }
+    /**
+     * <pre>
+     * 算法类别
+     * </pre>
+     *
+     * <code>repeated .Algorithm algorithms = 3;</code>
+     */
+    public java.util.List<Algorithm.Builder>
+         getAlgorithmsBuilderList() {
+      return getAlgorithmsFieldBuilder().getBuilderList();
+    }
+    private com.google.protobuf.RepeatedFieldBuilder<
+        Algorithm, Algorithm.Builder, AlgorithmOrBuilder>
+        getAlgorithmsFieldBuilder() {
+      if (algorithmsBuilder_ == null) {
+        algorithmsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+            Algorithm, Algorithm.Builder, AlgorithmOrBuilder>(
+                algorithms_,
+                ((bitField0_ & 0x00000004) != 0),
+                getParentForChildren(),
+                isClean());
+        algorithms_ = null;
+      }
+      return algorithmsBuilder_;
     }
 
     private long height_ ;

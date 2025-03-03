@@ -16,7 +16,7 @@ public final class VideoProcessorGrpc {
 
   // Static method descriptors that strictly reflect the proto.
   private static volatile io.grpc.MethodDescriptor<VideoFrame,
-          AnalysisResult> getProcessFrameMethod;
+      AnalysisResult> getProcessFrameMethod;
 
   @io.grpc.stub.annotations.RpcMethod(
       fullMethodName = SERVICE_NAME + '/' + "ProcessFrame",
@@ -24,7 +24,7 @@ public final class VideoProcessorGrpc {
       responseType = AnalysisResult.class,
       methodType = io.grpc.MethodDescriptor.MethodType.BIDI_STREAMING)
   public static io.grpc.MethodDescriptor<VideoFrame,
-          AnalysisResult> getProcessFrameMethod() {
+      AnalysisResult> getProcessFrameMethod() {
     io.grpc.MethodDescriptor<VideoFrame, AnalysisResult> getProcessFrameMethod;
     if ((getProcessFrameMethod = VideoProcessorGrpc.getProcessFrameMethod) == null) {
       synchronized (VideoProcessorGrpc.class) {
@@ -216,8 +216,8 @@ public final class VideoProcessorGrpc {
           getProcessFrameMethod(),
           io.grpc.stub.ServerCalls.asyncBidiStreamingCall(
             new MethodHandlers<
-                    VideoFrame,
-                    AnalysisResult>(
+              VideoFrame,
+              AnalysisResult>(
                 service, METHODID_PROCESS_FRAME)))
         .build();
   }

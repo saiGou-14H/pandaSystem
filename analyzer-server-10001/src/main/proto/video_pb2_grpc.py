@@ -3,7 +3,7 @@
 import grpc
 import warnings
 
-import video_pb2 as video__pb2
+from proto import video_pb2 as proto_dot_video__pb2
 
 GRPC_GENERATED_VERSION = '1.70.0'
 GRPC_VERSION = grpc.__version__
@@ -18,7 +18,7 @@ except ImportError:
 if _version_not_supported:
     raise RuntimeError(
         f'The grpc package installed is at version {GRPC_VERSION},'
-        + f' but the generated code in video_pb2_grpc.py depends on'
+        + f' but the generated code in proto/video_pb2_grpc.py depends on'
         + f' grpcio>={GRPC_GENERATED_VERSION}.'
         + f' Please upgrade your grpc module to grpcio>={GRPC_GENERATED_VERSION}'
         + f' or downgrade your generated code using grpcio-tools<={GRPC_VERSION}.'
@@ -36,8 +36,8 @@ class VideoProcessorStub(object):
         """
         self.ProcessFrame = channel.stream_stream(
                 '/VideoProcessor/ProcessFrame',
-                request_serializer=video__pb2.VideoFrame.SerializeToString,
-                response_deserializer=video__pb2.AnalysisResult.FromString,
+                request_serializer=proto_dot_video__pb2.VideoFrame.SerializeToString,
+                response_deserializer=proto_dot_video__pb2.AnalysisResult.FromString,
                 _registered_method=True)
 
 
@@ -55,8 +55,8 @@ def add_VideoProcessorServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'ProcessFrame': grpc.stream_stream_rpc_method_handler(
                     servicer.ProcessFrame,
-                    request_deserializer=video__pb2.VideoFrame.FromString,
-                    response_serializer=video__pb2.AnalysisResult.SerializeToString,
+                    request_deserializer=proto_dot_video__pb2.VideoFrame.FromString,
+                    response_serializer=proto_dot_video__pb2.AnalysisResult.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -84,8 +84,8 @@ class VideoProcessor(object):
             request_iterator,
             target,
             '/VideoProcessor/ProcessFrame',
-            video__pb2.VideoFrame.SerializeToString,
-            video__pb2.AnalysisResult.FromString,
+            proto_dot_video__pb2.VideoFrame.SerializeToString,
+            proto_dot_video__pb2.AnalysisResult.FromString,
             options,
             channel_credentials,
             insecure,

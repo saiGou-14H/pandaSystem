@@ -5,9 +5,13 @@ import lombok.SneakyThrows;
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.FrameGrabber;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class PullStreamThread extends Thread {
+    private static final Logger log = LoggerFactory.getLogger(PullStreamThread.class);
     public FFmpegFrameGrabber grabber;
     public LinkedBlockingQueue<Frame> frameQueue;
 
@@ -42,7 +46,7 @@ public class PullStreamThread extends Thread {
                 }
                 // 控制日志频率，每30帧打印一次
                 if (clonedFrame.timestamp % 30 == 0) {
-                    System.out.println("拉流帧时间戳：" + clonedFrame.timestamp);
+//                    log.atInfo().log("拉流帧时间戳：" + clonedFrame.timestamp);
                 }
             }
         }
@@ -58,11 +62,11 @@ public class PullStreamThread extends Thread {
                 grabber.close();
             }
         } catch (FrameGrabber.Exception e) {
-            System.err.println("停止抓取器出错：" + e.getMessage());
+            log.atError().log("停止抓取器出错：" + e.getMessage());
         }
         // 清空队列并关闭剩余帧
         frameQueue.forEach(Frame::close);
         frameQueue.clear();
-        System.out.println("拉流线程终止");
+        log.atInfo().log("拉流线程终止");
     }
 }

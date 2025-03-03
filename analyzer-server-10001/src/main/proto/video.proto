@@ -13,25 +13,50 @@ service VideoProcessor {
 message VideoFrame {
   bytes image_data = 1;      // 图片帧数据
   int64 timestamp = 2;      // 时间戳（毫秒）
-  int64 algorithms_type = 3;//算法类别
+  repeated Algorithm algorithms = 3;//算法类别
   int64 height = 4;          // 高度
   int64 width = 5;          // 宽度
 }
 
 message AnalysisResult {
   int64 timestamp = 1; // 时间戳（毫秒）
-  repeated BoundingBox boxes = 2;  // 检测框
-  string data = 3; // 算法返回数据
-  bytes image_data = 4;
+  repeated FaceBox face_boxes = 2;  // 检测框
+  repeated PersonBox person_boxes = 3;
+  string data = 4; // 算法返回数据
+  bytes image_data = 5;
 }
 
-message BoundingBox {
+message FaceBox {
   string label = 1;         // 类别标签
-  int64 x = 2;              // 左上角X坐标
-  int64 y = 3;              // 左上角Y坐标
-  int64 width = 4;          // 框宽度
-  int64 height = 5;         // 框高度
-  float score = 6;          // 置信度
-  string track_id = 7;      // 轨迹ID
-  string data = 8;          // 额外数据(JSON格式)
+  //边界框坐标归一化比例（0.0~1.0）
+  Point minPoint = 2;     // 左上角点
+  Point maxPoint = 3;     // 右下角点
+  float score = 4;          // 置信度
+  int64 track_id = 5;      // 轨迹ID
+  int64 face_id = 6;       // 人脸ID
+  int64 expression_id = 7;  // 表情ID（0～6）
+  string expression_feature = 8; // 表情特征
+  string data = 9;          // 额外数据(JSON格式)
+}
+
+message  PersonBox {
+  string label = 1;         // 类别标签
+  Point minPoint = 2;     // 左上角点
+  Point maxPoint = 3;     // 右下角点
+  repeated Point points = 4; // 人体关键点
+  float score = 5;          // 置信度
+  int64 track_id = 6;      // 轨迹ID
+  int64 attitude_id = 7;    // 姿态ID
+  string attitude_feature = 8; // 姿态特征
+  string data = 9;          // 额外数据(JSON格式)
+}
+message Point{
+  float x = 1;
+  float y = 2;
+}
+
+message Algorithm{
+  int64 type = 1; //算法类型
+  string name = 2; // 算法名称
+  string data = 3; // 算法参数
 }

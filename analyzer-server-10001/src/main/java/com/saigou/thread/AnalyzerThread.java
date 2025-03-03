@@ -1,21 +1,22 @@
 package com.saigou.thread;
 
 import com.google.protobuf.ByteString;
+import com.saigou.draw.Draw;
 import com.saigou.entity.ImageWrapper;
-import com.saigou.grpc.AnalysisResult;
-import com.saigou.grpc.VideoFrame;
-import com.saigou.grpc.VideoProcessorGrpc;
+import com.saigou.grpc.*;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
 import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.OpenCVFrameConverter;
 import org.bytedeco.opencv.opencv_core.Mat;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.Resource;
+import java.util.List;
 import java.util.concurrent.*;
 
 import static com.saigou.thread.EncodeThread.dencodeJpeg;
-
 public class AnalyzerThread extends Thread implements StreamObserver<AnalysisResult> {
     public LinkedBlockingQueue<ImageWrapper> imageQueue;
     public ConcurrentSkipListMap<Long,Frame> resultCache;
@@ -40,13 +41,17 @@ public class AnalyzerThread extends Thread implements StreamObserver<AnalysisRes
         while (!isInterrupted()){
             try{
                 ImageWrapper wrapper = imageQueue.poll(5, TimeUnit.MILLISECONDS);
+                Algorithm face = Algorithm.newBuilder().setName("face").setType(1).build();
+
+                Algorithm pose = Algorithm.newBuilder().setName("pose").setType(2).build();
                 if (wrapper != null && wrapper.imageData != null) {
                     VideoFrame videoFrame = VideoFrame.newBuilder()
                             .setImageData(wrapper.imageData)
                             .setTimestamp(wrapper.timestamp)
-                            .setAlgorithmsType(0)
                             .setHeight(wrapper.imageHeight)
                             .setWidth(wrapper.imageWidth)
+                            .addAlgorithms(face)
+                            .addAlgorithms(pose)
                             .build();
                     requestObserver.onNext(videoFrame);
                 }
@@ -55,6 +60,7 @@ public class AnalyzerThread extends Thread implements StreamObserver<AnalysisRes
             }
         }
     }
+
     @Override
     public void onNext(AnalysisResult analysisResult) {
         ByteString imageData = analysisResult.getImageData();
@@ -63,6 +69,14 @@ public class AnalyzerThread extends Thread implements StreamObserver<AnalysisRes
                 // jpeg解码
                 frameProcessorExecutor.submit(() -> {
                     Mat mat = dencodeJpeg(imageData);//释放该资源会导致帧顺序错误
+                    List<FaceBox> faceBoxes = analysisResult.getFaceBoxesList();
+                    List<PersonBox> expressions = analysisResult.getPersonBoxesList();
+                    long start = System.currentTimeMillis();
+                    for (FaceBox faceBox : faceBoxes) {
+                        Draw.drawRectangle(mat, faceBox.getMinPoint(), faceBox.getMaxPoint());
+                        Draw.drawText(mat, faceBox.getExpressionFeature(), faceBox.getMinPoint());
+                    }
+                    System.out.println("耗时：" + (System.currentTimeMillis() - start));
                     Frame frame = converter.convert(mat);
                     frame.timestamp = analysisResult.getTimestamp();
                     resultCache.put(frame.timestamp, frame);
