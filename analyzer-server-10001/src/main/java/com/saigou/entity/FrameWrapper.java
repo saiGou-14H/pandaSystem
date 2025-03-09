@@ -7,11 +7,11 @@ import java.util.List;
 
 public class FrameWrapper {
     public final List<FaceBox> faceBoxes;
-    public final List<PersonBox> faceBoxList;
+    public final List<PersonBox> PersonBoxs;
     public final Frame frame;
-    public FrameWrapper(Frame frame, List<FaceBox> faceBoxes, List<PersonBox> faceBoxList) {
+    public FrameWrapper(Frame frame, List<FaceBox> faceBoxes, List<PersonBox> PersonBoxs) {
         this.frame = frame;
         this.faceBoxes = faceBoxes;
-        this.faceBoxList = faceBoxList;
+        this.PersonBoxs = PersonBoxs;
     }
 }

@@ -1,0 +1,7 @@
+spring:
+  cloud:
+    openfeign:
+      okhttp:
+        enabled: true
+  application:
+    name: api

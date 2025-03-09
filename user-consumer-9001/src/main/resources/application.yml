@@ -14,7 +14,9 @@ spring:
       server-addr: scnu.saigou.work:8848
       discovery:
         group: pandaSystem
-
+auth:
+  jwt:
+    secret: 70852096
 custom:
   info:
     title: 熊猫

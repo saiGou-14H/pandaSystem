@@ -1,18 +1,17 @@
 package com.saigou.controller;
 
 
-import cn.hutool.Hutool;
 import com.saigou.api.userApi;
 import com.saigou.dto.UserDto;
 import com.saigou.entity.User;
-import com.saigou.util.JwtUtil;
+import com.saigou.util.AuthContext;
 import com.saigou.util.ResponseVO;
 
 import com.saigou.vo.UserVo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
@@ -30,9 +29,9 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RequestMapping("/user")
 @Tag(name="用户微服务")
+@RequiredArgsConstructor
 public class UserController {
-    @Resource
-    userApi userApi;
+    private final userApi userApi;
 
     @GetMapping("list")
     @Operation(summary = "查询",description = "查询所有用户")
@@ -55,7 +54,7 @@ public class UserController {
     @PutMapping("update")
     @Operation(summary = "修改",description = "修改用户信息")
     public ResponseVO update(HttpServletRequest request,@RequestBody UserDto userdto){
-        Long userId = JwtUtil.getUserId(request);
+        Long userId = AuthContext.getId();
         User user = userApi.get(userId,null);
         BeanUtils.copyProperties(userdto,user);
         return ResponseVO.success(userApi.update(user));
@@ -68,7 +67,7 @@ public class UserController {
     @GetMapping("info")
     @Operation(summary = "获取登录用户信息",description = "获取登录信息")
     public ResponseVO info(HttpServletRequest request){
-        Long userId = JwtUtil.getUserId(request);
+        Long userId = AuthContext.getId();
         User info = userApi.get(userId,null);
         UserVo userVo = new UserVo();
         BeanUtils.copyProperties(info,userVo);

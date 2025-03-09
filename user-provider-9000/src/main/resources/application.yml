@@ -32,13 +32,10 @@ custom:
 mybatis-plus:
   global-config:
     db-config:
-      #      logic-delete-field: flag # ????????????(since 3.3.0,????????????2)
-      logic-delete-value: 1     # ????
-      logic-not-delete-value: 0 # ??????
+      logic-delete-value: 1
+      logic-not-delete-value: 0
   type-aliases-package: com.org.model
 
-#    configuration:
-#        log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 
 

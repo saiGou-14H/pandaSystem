@@ -1,17 +1,13 @@
 package com.saigou;
 
-import com.google.protobuf.ByteString;
 import com.saigou.entity.FrameWrapper;
 import com.saigou.entity.ImageWrapper;
-import com.saigou.grpc.FaceBox;
-import com.saigou.grpc.PersonBox;
 import com.saigou.thread.AnalyzerThread;
 import com.saigou.thread.EncodeThread;
 import com.saigou.thread.PullStreamThread;
 import com.saigou.thread.PushStreamThread;
 import org.bytedeco.javacv.Frame;
 
-import java.util.List;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;

@@ -101,7 +101,7 @@ public class PushStreamThread extends Thread{
                 FrameWrapper result = CacheFrameHandler(frame.timestamp);
                 if (result != null) {
                     faceBoxList = result.faceBoxes;
-                    personBoxList = result.faceBoxList;
+                    personBoxList = result.PersonBoxs;
                     recorder.record(result.frame);
                     oldtimestamp=result.frame.timestamp;
                     Utils.safeCloseFrame(result.frame);
@@ -122,7 +122,6 @@ public class PushStreamThread extends Thread{
                         }
                         frame = converter.convert(mat);
                     }
-
                     recorder.record(frame);
                     oldtimestamp=frame.timestamp;
                 }
@@ -152,6 +151,13 @@ public class PushStreamThread extends Thread{
                 if (remove != null) {
                     keyList.remove(key);
                     Utils.safeCloseFrame(remove.frame);
+                    if(!remove.faceBoxes.isEmpty()){
+                        remove.faceBoxes.clear();
+                    }
+                    if(!remove.PersonBoxs.isEmpty()){
+                        remove.PersonBoxs.clear();
+                    }
+
                     System.out.println("[缓存帧超时:丢弃]："+key);
                 }
             }else{

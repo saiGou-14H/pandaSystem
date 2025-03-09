@@ -3,7 +3,14 @@ server:
 spring:
   application:
     name: gateway-9999
-
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.p6spy.engine.spy.P6SpyDriver
+    url: jdbc:p6spy:mysql://scnu.saigou.work:3306/scnu?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC&allowMultiQueries=true&allowPublicKeyRetrieval=true
+    username: scnu
+    password: Qq70852096..
+  main:
+    web-application-type: reactive
   cloud:
     nacos:
       server-addr: scnu.saigou.work:8848
@@ -26,6 +33,11 @@ spring:
           uri: lb://room-consumer-9002
           predicates:
             - Path=/room/**
+auth:
+  excludePaths:
+    - /auth/**
+  jwt:
+    secret: 70852096
 custom:
   info:
     title: 熊猫
@@ -40,6 +52,5 @@ custom:
     name: Authenticate
     token-url: http://kwqqr48rgo.cdhttp.cn/oauth2/token
     authorization-url: http://kwqqr48rgo.cdhttp.cn/oauth2/authorize
-
 
 
