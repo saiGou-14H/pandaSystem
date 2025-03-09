@@ -1,6 +1,5 @@
 package com.saigou.config;
 
-import com.saigou.entity.User;
 import com.saigou.util.AuthContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

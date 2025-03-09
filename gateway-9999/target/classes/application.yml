@@ -36,6 +36,8 @@ spring:
 auth:
   excludePaths:
     - /auth/**
+    - /room-consumer-9002/**
+    - /user-consumer-9001/**
   jwt:
     secret: 70852096
 custom:
