@@ -2,21 +2,21 @@ package com.saigou.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.saigou.entity.Room;
-import com.saigou.mapper.RoomMapper;
-import com.saigou.service.RoomService;
-import io.swagger.v3.oas.annotations.servers.Server;
+import com.saigou.mapper.IRoomMapper;
+import com.saigou.service.IRoomService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class RoomServiceImpl extends ServiceImpl<RoomMapper, Room> implements RoomService
+public class RoomServiceImpl extends ServiceImpl<IRoomMapper, Room> implements IRoomService
 {
     @Resource
-    private RoomMapper roomMapper;
+    private IRoomMapper roomMapper;
     @Override
     public int add(Room room) {
         return roomMapper.insert(room);
@@ -29,6 +29,7 @@ public class RoomServiceImpl extends ServiceImpl<RoomMapper, Room> implements Ro
 
     @Override
     public int update(Room room) {
+        System.out.println(room);
         return roomMapper.updateById(room);
     }
 

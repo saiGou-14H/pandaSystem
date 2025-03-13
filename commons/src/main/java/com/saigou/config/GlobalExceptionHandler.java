@@ -17,6 +17,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseVO exception(Exception e){
+        log.error("运行时异常：----------------{}",e.getMessage());
         return ResponseVO.error(500,e.getMessage());
     }
     @ExceptionHandler(CustomException.class)

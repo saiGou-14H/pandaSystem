@@ -16,7 +16,7 @@ public class CodeGenerator {
     public static void main(String[] args) {
         List<String> tables = new ArrayList<>();
 //        tables.add("user");
-        tables.add("room");
+        tables.add("room_control");
 //        tables.add("student");
 //        tables.add("sclass");
 //        tables.add("scourse");
@@ -25,7 +25,7 @@ public class CodeGenerator {
         FastAutoGenerator.create("jdbc:p6spy:mysql://scnu.saigou.work:3306/scnu?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC&allowMultiQueries=true&allowPublicKeyRetrieval=true","scnu","Qq70852096..")
                 .globalConfig(builder -> {
                     builder.author("saigou")               //作者
-                            .outputDir(System.getProperty("user.dir")+"\\api-commons\\src\\main\\java")    //输出路径(写到java目录)
+                            .outputDir(System.getProperty("user.dir")+"/api-commons/src/main/java")    //输出路径(写到java目录)
                             .enableSwagger()           //开启swagger
                             .commentDate("yyyy-MM-dd")
                             .fileOverride();            //开启覆盖之前生成的文件
@@ -40,7 +40,7 @@ public class CodeGenerator {
                             .controller("controller")
                             .mapper("mapper")
                             .xml("mapper")
-                            .pathInfo(Collections.singletonMap(OutputFile.mapperXml,System.getProperty("user.dir")+"\\api-commons\\src\\main\\resources\\mapper"));
+                            .pathInfo(Collections.singletonMap(OutputFile.mapperXml,System.getProperty("user.dir")+"/api-commons/src/main/resources/mapper"));
                 })
                 .strategyConfig(builder -> {
                     builder.addInclude(tables)

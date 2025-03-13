@@ -1,5 +1,6 @@
 package com.saigou.controller;
 import com.saigou.entity.Room;
+import com.saigou.util.ResponseEnum;
 import com.saigou.util.ResponseVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -8,6 +9,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import com.saigou.api.roomApi;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RestController
 @Slf4j
 @RequestMapping("/room")
@@ -18,7 +23,8 @@ public class RoomController {
     @GetMapping("list")
     @Operation(summary = "查询",description = "查询所有教室")
     public ResponseVO getAll() {
-        return ResponseVO.success(roomApi.getAll());
+        List<Room> collect = roomApi.getAll().stream().filter(room -> room.getDeleted() == 0).collect(Collectors.toList());
+        return ResponseVO.success(collect);
     }
 
     @PostMapping("add")
@@ -30,12 +36,21 @@ public class RoomController {
     @DeleteMapping("delete/{id}")
     @Operation(summary = "删除",description = "删除教室")
     public ResponseVO delete(@PathVariable("id") Long id) {
-        return ResponseVO.success(roomApi.delete(id));
+        Room byId = roomApi.getById(id, null);
+        if(byId==null){
+            return ResponseVO.error(ResponseEnum.ERROR.getCode(),"教室不存在");
+        }
+        if(byId.getDeleted()==1){
+            return ResponseVO.error(ResponseEnum.ERROR.getCode(),"教室已被删除");
+        }
+        byId.setDeleted(1);
+        return ResponseVO.success(roomApi.update(byId));
     }
 
     @PutMapping("update")
     @Operation(summary = "修改",description = "修改教室信息")
     public ResponseVO update(@RequestBody Room room) {
+        System.out.println(room);
         return ResponseVO.success(roomApi.update(room));
     }
 

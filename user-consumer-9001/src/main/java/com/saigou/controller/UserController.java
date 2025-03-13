@@ -66,7 +66,7 @@ public class UserController {
     }
     @GetMapping("info")
     @Operation(summary = "获取登录用户信息",description = "获取登录信息")
-    public ResponseVO info(HttpServletRequest request){
+    public ResponseVO info(){
         Long userId = AuthContext.getId();
         User info = userApi.get(userId,null);
         UserVo userVo = new UserVo();

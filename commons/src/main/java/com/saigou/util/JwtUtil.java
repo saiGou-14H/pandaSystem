@@ -72,6 +72,8 @@ public class JwtUtil {
         return id;
     }
     public static void main(String[] args) throws InterruptedException {
-        String token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYmYiOjE3MzUzNzMwODEsImlhdCI6MTczNTM3MzA4MSwiZXhwIjoxNzM1Mzc2NjgxLCJpZCI6MX0.biE6_xBxfOtkwDzsAundESKa5KN6SnaIyzwXXacusZA";
+        String token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYmYiOjE3NDE4NDQ3MzUsImlhdCI6MTc0MTg0NDczNSwiZXhwIjoxNzQxODQ4MzM1fQ.3lW6X4adHnvvR2RrEbqcQNdEidip00Wo2xMjOLq87AQ";
+        System.out.println(JWTUtil.parseToken(token).getPayloads());
+
     }
 }

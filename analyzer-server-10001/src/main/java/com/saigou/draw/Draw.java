@@ -1,12 +1,10 @@
 package com.saigou.draw;
 
-import com.saigou.annotation.TimeAnnotation;
 import org.bytedeco.opencv.opencv_core.Mat;
 import org.bytedeco.opencv.opencv_core.Point;
 import org.bytedeco.opencv.opencv_core.Scalar;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.bytedeco.opencv.global.opencv_imgproc.*;
@@ -15,10 +13,7 @@ public class Draw {
     public static final Scalar color = new Scalar(0, 255, 0, 0); // BGR 颜色
     public static final int thickness = 1;
     public  static final int radius = 2;
-    @TimeAnnotation
-    public void run1() throws InterruptedException {
-        Thread.sleep(1000);
-    }
+
     public static void drawRectangle(Mat mat, com.saigou.grpc.Point minPoint, com.saigou.grpc.Point maxPoint) {
         try(Point minPoint1 = new Point((int) (minPoint.getX()*mat.cols()), (int) (minPoint.getY()*mat.rows()));
                 Point maxPoint1 = new Point((int) (maxPoint.getX()*mat.cols()), (int) (maxPoint.getY()*mat.rows()));){

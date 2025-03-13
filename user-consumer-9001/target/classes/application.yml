@@ -9,11 +9,17 @@ spring:
     url: jdbc:p6spy:mysql://scnu.saigou.work:3306/scnu?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC&allowMultiQueries=true&allowPublicKeyRetrieval=true
     username: scnu
     password: Qq70852096..
+  data:
+    redis:
+      host: scnu.saigou.work
+      port: 6379
+      password: 70852096
   cloud:
     nacos:
       server-addr: scnu.saigou.work:8848
       discovery:
         group: pandaSystem
+
 auth:
   jwt:
     secret: 70852096

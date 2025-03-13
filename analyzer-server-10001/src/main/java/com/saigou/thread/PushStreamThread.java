@@ -5,6 +5,7 @@ import com.saigou.entity.FrameWrapper;
 import com.saigou.grpc.FaceBox;
 import com.saigou.grpc.PersonBox;
 import com.saigou.grpc.Point;
+import com.saigou.properties.PushProperties;
 import com.saigou.util.Utils;
 import lombok.SneakyThrows;
 import org.bytedeco.ffmpeg.global.avcodec;
@@ -22,13 +23,10 @@ public class PushStreamThread extends Thread{
     public LinkedBlockingQueue<Frame> pushFrameQueue;
     public ConcurrentSkipListMap<Long, FrameWrapper> resultCache;
     public CopyOnWriteArrayList<Long> keyList;
-    // 新增流量控制属性
-    private final Semaphore semaphore = new Semaphore(30);  // 限制每秒最多30帧
-
-
 
     @SneakyThrows
-    public PushStreamThread(String url, FFmpegFrameGrabber grabber, LinkedBlockingQueue<Frame> pushFrameQueue, ConcurrentSkipListMap<Long, FrameWrapper> resultCache, CopyOnWriteArrayList<Long> keyList) {
+    public PushStreamThread(String url, FFmpegFrameGrabber grabber, LinkedBlockingQueue<Frame> pushFrameQueue,
+                            ConcurrentSkipListMap<Long, FrameWrapper> resultCache, CopyOnWriteArrayList<Long> keyList, PushProperties pushProperties) {
         this.resultCache = resultCache;
         this.grabber = grabber;
         this.pushFrameQueue = pushFrameQueue;
@@ -39,33 +37,30 @@ public class PushStreamThread extends Thread{
                 grabber.getImageWidth(),
                 grabber.getImageHeight()
         );
-
         recorder.setVideoCodec(avcodec.AV_CODEC_ID_H264);
         recorder.setFrameRate(grabber.getFrameRate());
         recorder.setVideoBitrate(grabber.getVideoBitrate()); // 码率与输入一致 (10_000_000 10Mbs)
         recorder.setFormat("flv");
-        recorder.setVideoOption("tune", "zerolatency"); // 零延迟模式
-        recorder.setVideoOption("crf", "23"); // 画质与码率平衡
         recorder.setGopSize(60); // 关键帧间隔（帧数）
+        recorder.setVideoOption("tune", pushProperties.getTune()); // 零延迟模式
+        recorder.setVideoOption("crf",pushProperties.getCrf()); // 画质与码率平衡
 
-        recorder.setVideoOption("preset", "ultrafast");     // 预设模式
-        recorder.setVideoOption("quality", "speed");        // 速度优先
-        recorder.setVideoOption("rc", "cbr_ld_hq");         // 低延迟码率控制
-        recorder.setVideoOption("usage", "ultralowlatency");// 超低延迟模式
+        recorder.setVideoOption("preset", pushProperties.getPreset());     // 预设模式
+        recorder.setVideoOption("quality", pushProperties.getQuality());        // 速度优先
+        recorder.setVideoOption("rc", pushProperties.getRc());         // 低延迟码率控制
+        recorder.setVideoOption("usage", pushProperties.getUsage());// 超低延迟模式
 
-        recorder.setVideoOption("threads", "8");
-        recorder.setOption("rtbufsize", "2000k");     // 实时缓冲区大小
-        recorder.setOption("max_delay", "500000");    // 最大延迟（微秒）
-        recorder.setOption("reconnect", "1");         // 启用自动重连
-        recorder.setOption("reconnect_at_eof", "1");  // 在EOF时重连
-        recorder.setOption("reconnect_streamed", "1");// 流式重连
+        recorder.setVideoOption("threads", pushProperties.getThreads());
+        recorder.setOption("rtbufsize", pushProperties.getRtbufsize());     // 实时缓冲区大小
+        recorder.setOption("max_delay",pushProperties.getMax_delay());    // 最大延迟（微秒）
+        recorder.setOption("reconnect", pushProperties.getReconnect());         // 启用自动重连
+        recorder.setOption("reconnect_at_eof", pushProperties.getReconnect_at_eof());  // 在EOF时重连
+        recorder.setOption("reconnect_streamed", pushProperties.getReconnect_streamed());// 流式重连
 
         recorder.start();
 
         // 在程序初始化时启用 OpenCL
         opencv_core.setUseOpenCL(true);
-        // 验证加速是否生效
-        System.out.println("OpenCL 启用状态: " + opencv_core.useOpenCL());
     }
 
 
@@ -151,12 +146,12 @@ public class PushStreamThread extends Thread{
                 if (remove != null) {
                     keyList.remove(key);
                     Utils.safeCloseFrame(remove.frame);
-                    if(!remove.faceBoxes.isEmpty()){
-                        remove.faceBoxes.clear();
-                    }
-                    if(!remove.PersonBoxs.isEmpty()){
-                        remove.PersonBoxs.clear();
-                    }
+//                    if(!remove.faceBoxes.isEmpty()){
+//                        remove.faceBoxes.clear();
+//                    }
+//                    if(!remove.PersonBoxs.isEmpty()){
+//                        remove.PersonBoxs.clear();
+//                    }
 
                     System.out.println("[缓存帧超时:丢弃]："+key);
                 }

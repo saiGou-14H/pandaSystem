@@ -8,6 +8,34 @@ spring:
       server-addr: scnu.saigou.work:8848
       discovery:
         group: pandaSystem
+
+config:
+  pull:
+    maxImageWidth: 1920
+    maxImageHeight: 1080
+    rtsp_transport: tcp
+    hwaccel: auto
+    hwaccel_device: gpu
+  push:
+    recorder:
+      video-option:
+        tune: zerolatency    # 零延迟模式
+        preset: ultrafast    # 快速编码
+        crf: 23              # 画质与码率平衡
+        quality: speed   # 快速编码
+        rc: cbr_ld_hq        # 低延迟码率控制
+        usage: ultralowlatency # 超低延迟模式
+        threads: 8             # 线程数
+        rtbufsize: 2048K       # 缓冲区大小
+        max_delay: 500000      # 最大延迟（微秒）
+        reconnect: 1           # 启用自动重连
+        reconnect_at_eof: 1    # 在EOF时重连
+        reconnect_streamed: 1  # 流式重连
+  analyzer:
+    maxInboundMessageSize: 104857600 #100M 100*1024*1024
+    server:
+      - host: localhost
+        port: 50051
 custom:
   info:
     title: 熊猫

@@ -1,12 +1,11 @@
 package com.saigou.service.impl;
 
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.saigou.entity.User;
-import com.saigou.mapper.UserMapper;
-import com.saigou.service.UserService;
+import com.saigou.mapper.IUserMapper;
+import com.saigou.service.IUserService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
@@ -21,9 +20,9 @@ import java.util.List;
  * @since 2024-04-19
  */
 @Service
-public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
+public class UserServiceImpl extends ServiceImpl<IUserMapper, User> implements IUserService {
     @Resource
-    UserMapper userMapper;
+    IUserMapper userMapper;
     @Override
     public int add(User user) {
         return userMapper.insert(user);
@@ -43,10 +42,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public User getById(Long id) {
         return userMapper.selectById(id);
     }
-
-
-
-
     @Override
     public List<User> getAll() {
         return userMapper.getAll();

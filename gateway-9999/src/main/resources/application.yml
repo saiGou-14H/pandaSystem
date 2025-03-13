@@ -9,6 +9,11 @@ spring:
     url: jdbc:p6spy:mysql://scnu.saigou.work:3306/scnu?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC&allowMultiQueries=true&allowPublicKeyRetrieval=true
     username: scnu
     password: Qq70852096..
+  data:
+    redis:
+      host: scnu.saigou.work
+      port: 6379
+      password: 70852096
   main:
     web-application-type: reactive
   cloud:
@@ -28,7 +33,6 @@ spring:
           uri: lb://user-consumer-9001
           predicates:
             - Path=/auth/**,/user/**
-
         - id: room-consumer-9002
           uri: lb://room-consumer-9002
           predicates:

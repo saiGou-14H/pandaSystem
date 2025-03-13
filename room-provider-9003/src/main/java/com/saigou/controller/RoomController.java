@@ -1,13 +1,13 @@
 package com.saigou.controller;
 
+import cn.hutool.jwt.JWTUtil;
 import com.saigou.entity.Room;
-import com.saigou.entity.User;
+import com.saigou.service.IRoomService;
 import com.saigou.service.impl.RoomServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,11 +18,12 @@ import java.util.List;
 @Tag(name="教室微服务")
 public class RoomController {
     @Resource
-    private RoomServiceImpl roomService;
+    private IRoomService roomService;
 
     @PostMapping("add")
     @Operation(summary = "新增",description = "创建教室")
     public int add(@RequestBody Room room){
+
         return roomService.add(room);
     }
 

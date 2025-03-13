@@ -1,5 +1,6 @@
 package com.saigou.config;
 
+import cn.hutool.jwt.JWTUtil;
 import com.saigou.properties.AuthProperties;
 import com.saigou.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +36,7 @@ public class AuthConfigFilter implements GlobalFilter , Ordered {
         if (request.getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
             String token = jwtUtil.getHeaderToken(request);
             if (token != null) {
-                if (jwtUtil.verifyToken(token)) {
+                if (jwtUtil.verifyToken(token) && JWTUtil.parseToken(token).getPayloads().containsKey("id") ) {
                     log.info("token验证成功");
                     log.info("userId:" + jwtUtil.getUserId(token));
                     ServerHttpRequest newRequest = request.mutate().header("userId", jwtUtil.getUserId(token).toString()).build();

@@ -25,6 +25,7 @@ import io.swagger.v3.oas.annotations.servers.Server;
         ),
         servers = @Server(url = "${custom.info.gateway-url}")
 )
+
 @SecurityScheme(type = SecuritySchemeType.HTTP, name = "JWT", scheme = "bearer", in = SecuritySchemeIn.HEADER)
 public class Swagger3Config {
 //        @Bean

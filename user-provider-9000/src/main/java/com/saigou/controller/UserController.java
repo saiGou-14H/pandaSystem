@@ -1,16 +1,13 @@
 package com.saigou.controller;
 
 
-import com.saigou.dto.UserDto;
 import com.saigou.entity.User;
-import com.saigou.service.impl.UserServiceImpl;
+import com.saigou.service.IUserService;
 import com.saigou.util.AuthContext;
-import com.saigou.util.ResponseVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,7 +26,7 @@ import java.util.List;
 @Tag(name="用户微服务")
 public class UserController {
     @Resource
-    UserServiceImpl userService;
+    IUserService userService;
     @PostMapping ("add")
     @Operation(summary = "新增",description = "创建用户")
     public int add(@RequestBody User user){
@@ -49,11 +46,10 @@ public class UserController {
     @GetMapping("get")
     @Operation(summary = "查询",description = "根据id或account查找用户")
     public User get(@RequestParam(name = "id",required = false)Long id,@RequestParam(name = "account",required = false)String account){
-        System.out.println(AuthContext.getId());
         if (account!=null)
             return userService.getByAccount(account);
         if (id!=null)
-            return userService.getById(id);;
+            return userService.getById(id);
         return null;
     }
     @GetMapping("list")

@@ -1,34 +1,28 @@
 package com.saigou.thread;
 
+import com.saigou.properties.PullProperties;
 import com.saigou.util.Utils;
 import lombok.SneakyThrows;
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.FrameGrabber;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class PullStreamThread extends Thread {
-    private static final Logger log = LoggerFactory.getLogger(PullStreamThread.class);
     public FFmpegFrameGrabber grabber;
     public LinkedBlockingQueue<Frame> frameQueue;
 
-
-    public final int maxImageWidth = 1920;
-    public final int maxImageHeight = 1080;
     @SneakyThrows
-    public PullStreamThread(String url, LinkedBlockingQueue<Frame> frameQueue) {
+    public PullStreamThread(String url, LinkedBlockingQueue<Frame> frameQueue, PullProperties pullProperties) {
         this.frameQueue = frameQueue;
         this.grabber = new FFmpegFrameGrabber(url);
-        //关键配置：启用AMF硬件解码
-        grabber.setImageHeight(maxImageHeight);
-        grabber.setImageWidth(maxImageWidth);
-        grabber.setOption("hwaccel", "auto"); // 改为自动检测
-        grabber.setOption("hwaccel_device", "gpu");  // 指定GPU设备
-        grabber.setOption("rtsp_transport", "tcp");
-        grabber.start(); // 自动探测分辨率，无需强制设置
+        grabber.setImageHeight(pullProperties.getMaxImageHeight());
+        grabber.setImageWidth(pullProperties.getMaxImageWidth());
+        grabber.setOption("hwaccel", pullProperties.getHwaccel()); // 改为自动检测
+        grabber.setOption("hwaccel_device", pullProperties.getHwaccel_device());  // 指定GPU设备
+        grabber.setOption("rtsp_transport", pullProperties.getRtsp_transport());
+        grabber.start();
     }
 
     @SneakyThrows
@@ -46,7 +40,6 @@ public class PullStreamThread extends Thread {
                 }
                 // 控制日志频率，每30帧打印一次
                 if (clonedFrame.timestamp % 30 == 0) {
-//                    log.atInfo().log("拉流帧时间戳：" + clonedFrame.timestamp);
                 }
             }
         }
@@ -62,11 +55,11 @@ public class PullStreamThread extends Thread {
                 grabber.close();
             }
         } catch (FrameGrabber.Exception e) {
-            log.atError().log("停止抓取器出错：" + e.getMessage());
+            System.out.println("停止抓取器出错：" + e.getMessage());
         }
         // 清空队列并关闭剩余帧
         frameQueue.forEach(Frame::close);
         frameQueue.clear();
-        log.atInfo().log("拉流线程终止");
+        System.out.println("拉流线程终止");
     }
 }

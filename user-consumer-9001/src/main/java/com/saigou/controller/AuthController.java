@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     private final userApi userApi;
     private final JwtUtil jwtUtil;
+    private final RedisTemplate<String, Object> redisTemplate;
     @PostMapping("login")
     @Operation(summary = "登录",description = "根据账号密码登录")
     public ResponseVO login(@RequestBody User user){
@@ -34,13 +36,13 @@ public class AuthController {
         userVo.setRefreshToken(jwtUtil.getRefreshToken(auth.getId()));
         System.out.println("准备连接redies");
         //Redis保存token
-        RedisUtil.set("user:"+auth.getId(),userVo.getRefreshToken(),60*60*1);
+        redisTemplate.opsForValue().set("user:"+auth.getId(),userVo.getRefreshToken(),60*60*1);
         System.out.println("连接redis成功");
         return ResponseVO.success(userVo);
     }
     @GetMapping("refresh")
     @Operation(summary = "刷新token",description = "刷新token")
-    public ResponseVO refresh(HttpServletRequest request){
+    public ResponseVO refresh(){
         Long userId = AuthContext.getId();
         UserVo userVo = new UserVo();
         userVo.setAccessToken(jwtUtil.getAccessToken(userId));
@@ -49,10 +51,10 @@ public class AuthController {
 
     @PostMapping("logout")
     @Operation(summary = "退出登录",description = "退出登录")
-    public ResponseVO logout(HttpServletRequest request){
+    public ResponseVO logout(){
         Long userId = AuthContext.getId();
         //Redis删除登录信息
-        RedisUtil.del("user:"+userId);
+        redisTemplate.delete("user:"+userId);
         return ResponseVO.success();
     }
 }

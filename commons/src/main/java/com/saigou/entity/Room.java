@@ -2,11 +2,11 @@ package com.saigou.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-
 import java.io.Serializable;
 
 /**
@@ -36,12 +36,14 @@ private String name;
 private String address;
 
 @ApiModelProperty("描述")
-@TableField("desc")
-private String desc;
+@TableField("description")
+private String description;
 
 @TableField("url")
 private String url;
 
+    @TableField("deleted")
+    private Integer deleted;
 
 }
 

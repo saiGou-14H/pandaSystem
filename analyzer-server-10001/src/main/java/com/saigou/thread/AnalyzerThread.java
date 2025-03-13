@@ -5,6 +5,7 @@ import com.saigou.draw.Draw;
 import com.saigou.entity.FrameWrapper;
 import com.saigou.entity.ImageWrapper;
 import com.saigou.grpc.*;
+import com.saigou.properties.AnalyzerProperties;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
@@ -14,6 +15,7 @@ import org.bytedeco.opencv.opencv_core.Mat;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
@@ -22,29 +24,35 @@ import static com.saigou.thread.EncodeThread.dencodeJpeg;
 public class AnalyzerThread extends Thread implements StreamObserver<AnalysisResult> {
     public LinkedBlockingQueue<ImageWrapper> imageQueue;
     public ConcurrentSkipListMap<Long, FrameWrapper> resultCache;
-    public final ManagedChannel channel;
-    public final VideoProcessorGrpc.VideoProcessorStub stub;
+    public ManagedChannel channel;
+    public VideoProcessorGrpc.VideoProcessorStub stub;
     public StreamObserver<VideoFrame> requestObserver;
     private final ExecutorService frameProcessorExecutor = Executors.newFixedThreadPool(16);
     public OpenCVFrameConverter.ToMat converter;
-    public AnalyzerThread(LinkedBlockingQueue<ImageWrapper> imageQueue, ConcurrentSkipListMap<Long,FrameWrapper> resultCache){
+    private AnalyzerProperties analyzerProperties;
+    public AnalyzerThread(LinkedBlockingQueue<ImageWrapper> imageQueue,
+                          ConcurrentSkipListMap<Long,FrameWrapper> resultCache, AnalyzerProperties analyzerProperties){
         this.resultCache = resultCache;
         this.imageQueue = imageQueue;
-        channel = ManagedChannelBuilder.forAddress("localhost", 50051)
+        converter = new OpenCVFrameConverter.ToMat();
+        this.analyzerProperties = analyzerProperties;
+        init();
+    }
+    public void init(){
+        channel = ManagedChannelBuilder.forAddress(analyzerProperties.getServer().get(0).getHost(), analyzerProperties.getServer().get(0).getPort())
                 .usePlaintext()
-                .maxInboundMessageSize(100 * 1024 * 1024) // 100MB
-                .build();
+                .maxInboundMessageSize(analyzerProperties.getMaxInboundMessageSize()) // 100MB
+                .enableRetry().maxRetryAttempts(5).build();
         stub = VideoProcessorGrpc.newStub(channel);
         requestObserver = stub.processFrame(this);
-        converter = new OpenCVFrameConverter.ToMat();
     }
     @Override
     public void run() {
         while (!isInterrupted()){
+            ImageWrapper wrapper;
             try{
-                ImageWrapper wrapper = imageQueue.poll(5, TimeUnit.MILLISECONDS);
+                wrapper = imageQueue.poll(5, TimeUnit.MILLISECONDS);
                 Algorithm face = Algorithm.newBuilder().setName("face").setType(1).build();
-
                 Algorithm pose = Algorithm.newBuilder().setName("pose").setType(2).build();
                 if (wrapper != null && wrapper.imageData != null) {
                     VideoFrame videoFrame = VideoFrame.newBuilder()
@@ -103,12 +111,6 @@ public class AnalyzerThread extends Thread implements StreamObserver<AnalysisRes
     @Override
     public void onError(Throwable throwable) {
         System.err.println("gRPC 流错误: " + throwable.getMessage());
-        // 尝试重建连接
-        try {
-            requestObserver = stub.processFrame(this); // 重连
-        } catch (Exception e) {
-            System.err.println("重连失败: " + e.getMessage());
-        }
     }
 
     @Override
