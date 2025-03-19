@@ -11,5 +11,4 @@ import java.util.List;
 public class AnalyzerProperties {
     private int maxInboundMessageSize;
     private List<Address> server;
-
 }

@@ -1,12 +1,11 @@
 package com.saigou.controller;
 
-import com.saigou.api.userApi;
+import com.saigou.api.UserApi;
 import com.saigou.entity.User;
 import com.saigou.util.*;
 import com.saigou.vo.UserVo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -19,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name="登录微服务")
 @RequiredArgsConstructor
 public class AuthController {
-    private final userApi userApi;
+    private final UserApi userApi;
     private final JwtUtil jwtUtil;
     private final RedisTemplate<String, Object> redisTemplate;
     @PostMapping("login")
@@ -34,10 +33,8 @@ public class AuthController {
         BeanUtils.copyProperties(auth,userVo);
         userVo.setAccessToken(jwtUtil.getAccessToken(auth.getId()));
         userVo.setRefreshToken(jwtUtil.getRefreshToken(auth.getId()));
-        System.out.println("准备连接redies");
         //Redis保存token
         redisTemplate.opsForValue().set("user:"+auth.getId(),userVo.getRefreshToken(),60*60*1);
-        System.out.println("连接redis成功");
         return ResponseVO.success(userVo);
     }
     @GetMapping("refresh")

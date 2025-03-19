@@ -3,12 +3,15 @@
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="FrameworkDetectionExcludesConfiguration">
     <file type="web" url="file://$PROJECT_DIR$/api" />
+    <file type="web" url="file://$PROJECT_DIR$/control-provider-9006" />
   </component>
   <component name="MavenProjectsManager">
     <option name="originalFiles">
       <list>
         <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/api/pom.xml" />
+        <option value="$PROJECT_DIR$/control-provider-9006/pom.xml" />
+        <option value="$PROJECT_DIR$/control-consumer-9007/pom.xml" />
       </list>
     </option>
   </component>

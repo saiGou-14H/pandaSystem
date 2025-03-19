@@ -12,9 +12,10 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class PullStreamThread extends Thread {
     public FFmpegFrameGrabber grabber;
     public LinkedBlockingQueue<Frame> frameQueue;
-
     @SneakyThrows
-    public PullStreamThread(String url, LinkedBlockingQueue<Frame> frameQueue, PullProperties pullProperties) {
+    public PullStreamThread(String url,
+                            LinkedBlockingQueue<Frame> frameQueue,
+                            PullProperties pullProperties) {
         this.frameQueue = frameQueue;
         this.grabber = new FFmpegFrameGrabber(url);
         grabber.setImageHeight(pullProperties.getMaxImageHeight());
@@ -24,7 +25,6 @@ public class PullStreamThread extends Thread {
         grabber.setOption("rtsp_transport", pullProperties.getRtsp_transport());
         grabber.start();
     }
-
     @SneakyThrows
     public void run() {
         Frame frame;
@@ -37,9 +37,6 @@ public class PullStreamThread extends Thread {
                     Frame oldFrame = frameQueue.poll();
                     Utils.safeCloseFrame(oldFrame);
                     frameQueue.offer(clonedFrame);
-                }
-                // 控制日志频率，每30帧打印一次
-                if (clonedFrame.timestamp % 30 == 0) {
                 }
             }
         }

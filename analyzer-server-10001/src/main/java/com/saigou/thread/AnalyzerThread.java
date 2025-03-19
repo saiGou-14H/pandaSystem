@@ -31,7 +31,8 @@ public class AnalyzerThread extends Thread implements StreamObserver<AnalysisRes
     public OpenCVFrameConverter.ToMat converter;
     private AnalyzerProperties analyzerProperties;
     public AnalyzerThread(LinkedBlockingQueue<ImageWrapper> imageQueue,
-                          ConcurrentSkipListMap<Long,FrameWrapper> resultCache, AnalyzerProperties analyzerProperties){
+                          ConcurrentSkipListMap<Long,FrameWrapper> resultCache,
+                          AnalyzerProperties analyzerProperties){
         this.resultCache = resultCache;
         this.imageQueue = imageQueue;
         converter = new OpenCVFrameConverter.ToMat();
@@ -39,9 +40,10 @@ public class AnalyzerThread extends Thread implements StreamObserver<AnalysisRes
         init();
     }
     public void init(){
-        channel = ManagedChannelBuilder.forAddress(analyzerProperties.getServer().get(0).getHost(), analyzerProperties.getServer().get(0).getPort())
+        channel = ManagedChannelBuilder.forAddress(analyzerProperties.getServer().get(0).getHost(),
+                        analyzerProperties.getServer().get(0).getPort())
                 .usePlaintext()
-                .maxInboundMessageSize(analyzerProperties.getMaxInboundMessageSize()) // 100MB
+                .maxInboundMessageSize(analyzerProperties.getMaxInboundMessageSize())
                 .enableRetry().maxRetryAttempts(5).build();
         stub = VideoProcessorGrpc.newStub(channel);
         requestObserver = stub.processFrame(this);

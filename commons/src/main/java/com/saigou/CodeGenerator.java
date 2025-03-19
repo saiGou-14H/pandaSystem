@@ -16,7 +16,11 @@ public class CodeGenerator {
     public static void main(String[] args) {
         List<String> tables = new ArrayList<>();
 //        tables.add("user");
-        tables.add("room_control");
+        tables.add("sclass");
+        tables.add("scourse");
+        tables.add("student");
+        tables.add("sclass_scourse");
+        tables.add("student_sclass");
 //        tables.add("student");
 //        tables.add("sclass");
 //        tables.add("scourse");

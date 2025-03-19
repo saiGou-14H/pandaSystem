@@ -7,12 +7,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @FeignClient(value = "room-provider-9003")
-public interface roomApi {
+public interface RoomApi {
 
     @PostMapping("room/add")
     int add(@RequestBody Room room);
 
-    @DeleteMapping("room/delete")
+    @DeleteMapping("room/delete/{id}")
     int delete(@PathVariable("id") Long id);
 
     @PutMapping("room/update")

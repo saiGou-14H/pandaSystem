@@ -1,15 +1,10 @@
 syntax = "proto3";
-
 option java_multiple_files = true;
 option java_package = "com.saigou.grpc";
 option java_outer_classname = "VideoProto";
-// option objc_class_prefix = "Hello";
-
-
 service VideoProcessor {
   rpc ProcessFrame(stream VideoFrame) returns (stream AnalysisResult);
 }
-
 message VideoFrame {
   bytes image_data = 1;      // 图片帧数据
   int64 timestamp = 2;      // 时间戳（毫秒）
@@ -17,7 +12,6 @@ message VideoFrame {
   int64 height = 4;          // 高度
   int64 width = 5;          // 宽度
 }
-
 message AnalysisResult {
   int64 timestamp = 1; // 时间戳（毫秒）
   repeated FaceBox face_boxes = 2;  // 检测框
@@ -25,7 +19,6 @@ message AnalysisResult {
   string data = 4; // 算法返回数据
   bytes image_data = 5;
 }
-
 message FaceBox {
   string label = 1;         // 类别标签
   //边界框坐标归一化比例（0.0~1.0）
@@ -38,7 +31,6 @@ message FaceBox {
   string expression_feature = 8; // 表情特征
   string data = 9;          // 额外数据(JSON格式)
 }
-
 message  PersonBox {
   string label = 1;         // 类别标签
   Point minPoint = 2;     // 左上角点
@@ -54,7 +46,6 @@ message Point{
   float x = 1;
   float y = 2;
 }
-
 message Algorithm{
   int64 type = 1; //算法类型
   string name = 2; // 算法名称

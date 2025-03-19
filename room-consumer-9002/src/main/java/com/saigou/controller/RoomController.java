@@ -8,7 +8,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
-import com.saigou.api.roomApi;
+import com.saigou.api.RoomApi;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @Tag(name="教室微服务")
 public class RoomController {
     @Resource
-    roomApi roomApi;
+    RoomApi roomApi;
     @GetMapping("list")
     @Operation(summary = "查询",description = "查询所有教室")
     public ResponseVO getAll() {

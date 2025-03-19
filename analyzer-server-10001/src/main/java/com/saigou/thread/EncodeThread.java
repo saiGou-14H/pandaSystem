@@ -23,14 +23,15 @@ public class EncodeThread extends Thread{
     );
     public static Mat dencodeJpeg(ByteString data) {
         try (Mat inputMat = new Mat(data.toByteArray());
-             Mat decodedMat = opencv_imgcodecs.imdecode(inputMat, opencv_imgcodecs.IMREAD_COLOR)) {
+             Mat decodedMat = opencv_imgcodecs.
+                     imdecode(inputMat, opencv_imgcodecs.IMREAD_COLOR)) {
             return decodedMat.clone(); // 返回独立副本
         }
     }
-
     public static ByteString encodeJpeg(Mat mat) {
         try (BytePointer buffer = new BytePointer()) {
-            if (!opencv_imgcodecs.imencode(".jpg", mat, buffer, jpegParams)) {
+            if (!opencv_imgcodecs.
+                    imencode(".jpg", mat, buffer, jpegParams)) {
                 return ByteString.EMPTY;
             }
             return ByteString.copyFrom(buffer.getStringBytes());
@@ -42,9 +43,10 @@ public class EncodeThread extends Thread{
         this.pushFrameQueue = pushFrameQueue;
         this.keyList = keyList;
     }
+    int count = 15;
+    int frameCount = 0;
 
     private final ExecutorService frameProcessorExecutor = Executors.newFixedThreadPool(16);
-
     private void handleFrame(Frame frame) {
         try (OpenCVFrameConverter.ToMat converter = new OpenCVFrameConverter.ToMat();
              Mat mat = converter.convert(frame);// 缩放图像
@@ -66,9 +68,6 @@ public class EncodeThread extends Thread{
             System.out.println("帧处理失败"+e.getMessage());
         }
     }
-
-    int count = 15;
-    int frameCount = 0;
     @Override
     public void run() {
         while (!isInterrupted()){
@@ -82,7 +81,6 @@ public class EncodeThread extends Thread{
                         }
                     pushFrameQueue.offer(frame);
                     frameCount++;
-
                 }
             } catch (InterruptedException e) {
                 interrupt();

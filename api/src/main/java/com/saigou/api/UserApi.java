@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @FeignClient(value = "user-provider-9000")
-public interface userApi {
+public interface UserApi {
     @GetMapping("user/list")
     List<User> getAll();
 

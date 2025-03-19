@@ -1,7 +1,7 @@
 package com.saigou.controller;
 
 
-import com.saigou.api.userApi;
+import com.saigou.api.UserApi;
 import com.saigou.dto.UserDto;
 import com.saigou.entity.User;
 import com.saigou.util.AuthContext;
@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name="用户微服务")
 @RequiredArgsConstructor
 public class UserController {
-    private final userApi userApi;
+    private final UserApi userApi;
 
     @GetMapping("list")
     @Operation(summary = "查询",description = "查询所有用户")

@@ -7,16 +7,25 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="course-provider-9004" />
+        <module name="control-consumer-9007" />
+        <module name="course-consumer-9005" />
+        <module name="control-provider-9006" />
+        <module name="user-consumer-9001" />
+        <module name="room-consumer-9002" />
+        <module name="commons" />
         <module name="user-provider-9000" />
         <module name="media-server-10000" />
         <module name="analyzer-server-10001" />
         <module name="room-provider-9003" />
         <module name="gateway-9999" />
-        <module name="user-consumer-9001" />
-        <module name="room-consumer-9002" />
         <module name="api" />
-        <module name="commons" />
       </profile>
     </annotationProcessing>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="control-consumer-9007" options="" />
+    </option>
   </component>
 </project>

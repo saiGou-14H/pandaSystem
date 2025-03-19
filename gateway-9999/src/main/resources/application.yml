@@ -22,6 +22,12 @@ spring:
       discovery:
         group: pandaSystem
     gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedHeaders: "*"
+            allowedMethods: "*"
       discovery:
         locator:
           # 根据注册中心的服务自动生成路由
@@ -42,6 +48,8 @@ auth:
     - /auth/**
     - /room-consumer-9002/**
     - /user-consumer-9001/**
+    - /course-consumer-9005/**
+    -
   jwt:
     secret: 70852096
 custom:
