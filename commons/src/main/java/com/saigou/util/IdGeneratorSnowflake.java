@@ -13,7 +13,7 @@ import javax.annotation.PostConstruct;
 public class IdGeneratorSnowflake {
     private long workerId = 0;
     private long datacenterId = 1;
-    private Snowflake snowflake = IdUtil.createSnowflake(workerId, datacenterId);
+    private Snowflake snowflake = IdUtil.getSnowflake(workerId, datacenterId);
 
     @PostConstruct
     public void init() {
@@ -33,7 +33,7 @@ public class IdGeneratorSnowflake {
     }
 
     public synchronized long snowflakeId(long workerId, long datacenterId) {
-        snowflake = IdUtil.createSnowflake(workerId, datacenterId);
+        snowflake = IdUtil.getSnowflake(workerId, datacenterId);
         return snowflake.nextId();
     }
 

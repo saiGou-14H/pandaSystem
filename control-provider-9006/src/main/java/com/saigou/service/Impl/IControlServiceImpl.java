@@ -43,4 +43,18 @@ public class IControlServiceImpl  extends ServiceImpl<IControllerMapper, Control
     public List<Control> getAll() {
         return iControllerMapper.selectList(null);
     }
+
+    @Override
+    public int executeControl(Long id) {
+        UpdateWrapper<Control> wrapper = new UpdateWrapper<Control>();
+        wrapper.eq("id",id).set("status","active");
+        return iControllerMapper.update(wrapper);
+    }
+
+    @Override
+    public int cancelControl(Long id) {
+        UpdateWrapper<Control> wrapper = new UpdateWrapper<Control>();
+        wrapper.eq("id",id).set("status","cancel");
+        return iControllerMapper.update(wrapper);
+    }
 }

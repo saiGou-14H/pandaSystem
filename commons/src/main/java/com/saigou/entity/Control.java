@@ -1,5 +1,6 @@
 package com.saigou.entity;
 
+        import com.baomidou.mybatisplus.annotation.IdType;
         import com.baomidou.mybatisplus.annotation.TableField;
         import com.baomidou.mybatisplus.annotation.TableId;
         import com.baomidou.mybatisplus.annotation.TableName;
@@ -25,7 +26,7 @@ package com.saigou.entity;
         private static final long serialVersionUID = 1L;
 
         @ApiModelProperty("雪花ID")
-        @TableId("id")
+        @TableId(value = "id", type = IdType.ASSIGN_ID)
         private Long id;
 
         @ApiModelProperty("视频帧率")
@@ -37,12 +38,12 @@ package com.saigou.entity;
         private String status;
 
         @ApiModelProperty("布控添加时间")
-        @TableField("time")
-        private LocalDateTime time;
+        @TableField("add_time")
+        private LocalDateTime addTime;
 
         @ApiModelProperty("逻辑删除")
-        @TableField("delete")
-        private Boolean delete;
+        @TableField("deleted")
+        private Boolean deleted;
 
 
         }

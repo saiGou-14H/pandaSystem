@@ -1,6 +1,7 @@
 package com.saigou.service;
 
 import com.saigou.entity.Control;
+import com.saigou.entity.ControlDto;
 
 import java.util.List;
 
@@ -10,4 +11,6 @@ public interface IControlService {
     int update(Control control);
     Control getById(Long id);
     List<Control> getAll();
+    int executeControl(Long id);
+    int cancelControl(Long id);
 }

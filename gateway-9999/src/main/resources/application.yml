@@ -43,13 +43,26 @@ spring:
           uri: lb://room-consumer-9002
           predicates:
             - Path=/room/**
+        - id: course-consumer-9005
+          uri: lb://course-consumer-9005
+          predicates:
+            - Path=/course/**
+        - id: control-consumer-9007
+          uri: lb://control-consumer-9007
+          predicates:
+            - Path=/control/**
 auth:
   excludePaths:
     - /auth/**
     - /room-consumer-9002/**
+    - /room-provider-9003/**
     - /user-consumer-9001/**
+    - /user-provider-9000/**
     - /course-consumer-9005/**
-    -
+    - /course-provider-9004/**
+    - /control-consumer-9007/**
+    - /control-provider-9006/**
+
   jwt:
     secret: 70852096
 custom:
