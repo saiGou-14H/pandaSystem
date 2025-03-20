@@ -55,23 +55,14 @@ public class ControlController {
 
     @GetMapping("/getById/{id}")
     @Operation(summary = "查询",description = "根据id查询布控")
-    public Control getById(@PathVariable("id") Long id){
+    public ControlDto getById(@PathVariable("id") Long id){
         return iControlService.getById(id);
     }
 
     @GetMapping("/list")
     @Operation(summary = "查询所有",description = "查询所有布控")
     public List<ControlDto> getAll(){
-        List<Control> all = iControlService.getAll();
-        List<ControlDto> collect = all.stream().map(control -> {
-            ControlDto controlDto = new ControlDto();
-            BeanUtils.copyProperties(control,controlDto);
-            controlDto.setRoomId(iRoomControlService.getByControlId(control.getId()).getRoomId());
-            System.out.println(controlDto);
-            return controlDto;
-        }).collect(Collectors.toList());
-        System.out.println(collect);
-        return collect;
+        return iControlService.getAll();
     }
 
     @GetMapping("/execute/{id}")

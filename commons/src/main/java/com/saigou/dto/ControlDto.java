@@ -28,6 +28,9 @@ public class ControlDto implements Serializable {
     @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
 
+    @ApiModelProperty("布控推流地址")
+    private String url;
+
     @ApiModelProperty("视频帧率")
     private Double fps;
 
@@ -35,10 +38,18 @@ public class ControlDto implements Serializable {
     private String status;
 
     @ApiModelProperty("布控添加时间")
-    private LocalDateTime addTime;
+    private LocalDateTime createTime;
 
     @ApiModelProperty("布控教室id")
     private Long roomId;
+    @ApiModelProperty("布控教室名称")
+    private String roomName;
+    @ApiModelProperty("布控教室地址")
+    private String roomAddress;
+    @ApiModelProperty("布控教室描述")
+    private String roomDescription;
+    @ApiModelProperty("布控教室url")
+    private String roomUrl;
 
 
 }

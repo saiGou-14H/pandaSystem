@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.saigou.entity.Control;
+import com.saigou.entity.ControlDto;
 import com.saigou.mapper.IControllerMapper;
 import com.saigou.service.IControlService;
 import lombok.RequiredArgsConstructor;
@@ -33,15 +34,13 @@ public class IControlServiceImpl  extends ServiceImpl<IControllerMapper, Control
     }
 
     @Override
-    public Control getById(Long id) {
-        QueryWrapper<Control> wrapper = new QueryWrapper<Control>();
-        wrapper.eq("id",id);
-        return iControllerMapper.selectOne(wrapper);
+    public ControlDto getById(Long id) {
+        return iControllerMapper.getById(id);
     }
 
     @Override
-    public List<Control> getAll() {
-        return iControllerMapper.selectList(null);
+    public List<ControlDto> getAll() {
+        return iControllerMapper.getAll();
     }
 
     @Override

@@ -1,9 +1,7 @@
 package com.saigou.entity;
 
-        import com.baomidou.mybatisplus.annotation.IdType;
-        import com.baomidou.mybatisplus.annotation.TableField;
-        import com.baomidou.mybatisplus.annotation.TableId;
-        import com.baomidou.mybatisplus.annotation.TableName;
+        import com.baomidou.mybatisplus.annotation.*;
+
         import java.io.Serializable;
         import java.time.LocalDateTime;
         import io.swagger.annotations.ApiModel;
@@ -29,6 +27,10 @@ package com.saigou.entity;
         @TableId(value = "id", type = IdType.ASSIGN_ID)
         private Long id;
 
+        @ApiModelProperty("布控推流地址")
+        @TableField("url")
+        private String url;
+
         @ApiModelProperty("视频帧率")
         @TableField("fps")
         private Double fps;
@@ -38,8 +40,8 @@ package com.saigou.entity;
         private String status;
 
         @ApiModelProperty("布控添加时间")
-        @TableField("add_time")
-        private LocalDateTime addTime;
+        @TableField(value = "create_time", fill = FieldFill.INSERT)
+        private LocalDateTime createTime;
 
         @ApiModelProperty("逻辑删除")
         @TableField("deleted")

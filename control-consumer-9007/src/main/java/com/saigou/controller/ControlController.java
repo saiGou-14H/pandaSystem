@@ -18,7 +18,7 @@ public class ControlController {
 
     @GetMapping("/get/{id}")
     @Operation(summary = "根据id查询布控信息",description = "根据id查询布控信息")
-    public ResponseVO getById(Long id) {
+    public ResponseVO getById(@PathVariable("id") Long id){
 
         return ResponseVO.success(controlApi.getById(id));
     }
@@ -37,7 +37,7 @@ public class ControlController {
 
     @DeleteMapping("/delete/{id}")
     @Operation(summary = "删除布控信息",description = "根据id删除布控信息")
-    public ResponseVO delete(Long id) {
+    public ResponseVO delete(@PathVariable("id") Long id){
         return ResponseVO.success(controlApi.delete(id));
     }
 

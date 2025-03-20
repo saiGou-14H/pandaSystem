@@ -9,8 +9,8 @@ public interface IControlService {
     int add(Control control);
     int delete(Long id);
     int update(Control control);
-    Control getById(Long id);
-    List<Control> getAll();
+    ControlDto getById(Long id);
+    List<ControlDto> getAll();
     int executeControl(Long id);
     int cancelControl(Long id);
 }
