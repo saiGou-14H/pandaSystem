@@ -9,10 +9,10 @@ import java.util.List;
 
 @FeignClient(value = "control-provider-9006")
 public interface ControlApi {
-    @DeleteMapping("/control/get/{id}")
-    Control getById(@PathVariable("id") Long id);
-    @PostMapping("/control/add")
-    int add(@RequestBody ControlDto controlDto);
+    @GetMapping("/control/get/{id}")
+    ControlDto getById(@PathVariable("id") Long id);
+    @PostMapping("/control/create")
+    Long create(@RequestBody ControlDto controlDto);
     @DeleteMapping("/control/delete/{id}")
     int delete(@PathVariable("id") Long id);
     @PutMapping("/control/update")

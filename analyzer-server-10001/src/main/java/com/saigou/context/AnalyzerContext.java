@@ -1,30 +1,98 @@
 package com.saigou.context;
 
+import com.saigou.properties.AnalyzerProperties;
+import com.saigou.properties.PullProperties;
+import com.saigou.properties.PushProperties;
 import com.saigou.util.StreamProcessor;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 @Data
 @Component
+@RequiredArgsConstructor
 public class AnalyzerContext {
     private final String ANALYZER_CONTEXT_KEY = "analyzerContext";
+    private final String APP = "analyzer";
+    @Value("${media.host}")
+    private String DEFAULT_HOST;
+    @Value("${media.rtmp_port}")
+    private String DEFAULT_RTMP_PORT;
+    @Value("${media.rtsp_port}")
+    private String DEFAULT_RTSP_PORT;
+    @Value("${media.http_port}")
+    private String DEFAULT_HTTP_PORT;
+    @Value("${media.rtc_port}")
+    private String DEFAULT_RTC_PORT;
+
+
+    private final PullProperties pullProperties;
+    private final AnalyzerProperties analyzerProperties;
+    private final PushProperties pushProperties;
     private final Map<Long, StreamProcessor> streamProcessorMap = new HashMap<>();
+
+
+    public List<StreamProcessor> getAllStreamProcessor() {
+        return streamProcessorMap.values().stream().toList();
+    }
 
     public StreamProcessor getStreamProcessor(Long id) {
         return streamProcessorMap.get(id);
     }
 
-    public void addStreamProcessor(Long id, StreamProcessor streamProcessor) {
+    public StreamProcessor addStreamProcessor(Long id, String url,String stream) {
+        if (streamProcessorMap.containsKey(id)) {
+            return streamProcessorMap.get(id);
+        }
+        StreamProcessor streamProcessor = new StreamProcessor();
+        streamProcessor.initConfig(pullProperties,analyzerProperties,pushProperties);
+        String rtmpPushUrl = "rtmp://"+DEFAULT_HOST+":"+DEFAULT_RTMP_PORT+"/"+APP+"/"+stream;
+        String httpPushUrl = "http://"+DEFAULT_HOST+":"+DEFAULT_HTTP_PORT+"/"+APP+"/"+stream+".live.flv";
+        streamProcessor.init(id,url,rtmpPushUrl,httpPushUrl);
         streamProcessorMap.put(id, streamProcessor);
+       return streamProcessor;
     }
 
-    public void removeStreamProcessor(Long id) {
+    public void executeStreamProcessor(Long id){
+        StreamProcessor streamProcessor = streamProcessorMap.get(id);
+        if(streamProcessor==null){
+            return;
+        }
+        if(streamProcessor.isAlive()){
+            return;
+        }
+        streamProcessor.start();
+    }
+
+    public void cancelStreamProcessor(Long id){
+        StreamProcessor streamProcessor = streamProcessorMap.get(id);
+        if(streamProcessor==null){
+            return;
+        }
+        if(!streamProcessor.isAlive()){
+            return;
+        }
+        streamProcessor.stop();
+    }
+
+    public void removeStreamProcessor(Long id){
+        StreamProcessor streamProcessor = streamProcessorMap.get(id);
+        if(streamProcessor==null){
+            return;
+        }
+        if(streamProcessor.isAlive()){
+            streamProcessor.stop();
+        }
         streamProcessorMap.remove(id);
     }
 
     public void clear() {
+        stopAll();
         streamProcessorMap.clear();
     }
     public void stopAll() {

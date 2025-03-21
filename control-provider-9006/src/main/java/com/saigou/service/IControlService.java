@@ -6,7 +6,7 @@ import com.saigou.entity.ControlDto;
 import java.util.List;
 
 public interface IControlService {
-    int add(Control control);
+    int create(Control control);
     int delete(Long id);
     int update(Control control);
     ControlDto getById(Long id);

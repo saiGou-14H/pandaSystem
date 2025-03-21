@@ -17,7 +17,7 @@ public class IControlServiceImpl  extends ServiceImpl<IControllerMapper, Control
     private final IControllerMapper iControllerMapper;
 
     @Override
-    public int add(Control control) {
+    public int create(Control control) {
         return iControllerMapper.insert(control);
     }
 

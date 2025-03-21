@@ -51,6 +51,14 @@ spring:
           uri: lb://control-consumer-9007
           predicates:
             - Path=/control/**
+        - id: analyzer-server-10001
+          uri: lb://analyzer-server-10001
+          predicates:
+            - Path=/analyzer/**
+        - id: media-server-10000
+          uri: lb://media-server-10000
+          predicates:
+            - Path=/media/**
 auth:
   excludePaths:
     - /auth/**
@@ -62,6 +70,8 @@ auth:
     - /course-provider-9004/**
     - /control-consumer-9007/**
     - /control-provider-9006/**
+    - /analyzer-server-10001/**
+    - /media-server-10000/**
 
   jwt:
     secret: 70852096

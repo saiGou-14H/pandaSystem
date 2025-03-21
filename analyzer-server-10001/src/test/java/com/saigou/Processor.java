@@ -25,20 +25,20 @@ public class Processor {
 
     @Test
     public  void testa(){
-        String url1 = "rtsp://127.0.0.1:7554/live/30-2";
-        String url2 = "rtmp://127.0.0.1:7935/live/test3";
-
-        String url3 = "rtsp://127.0.0.1:7554/live/30";
-        String url4 = "rtmp://127.0.0.1:7935/live/test4";
-        streamProcessor.init(url1,url2);
-        streamProcessor.start();
-        streamProcessor2.init(url3,url4);
-        streamProcessor2.start();
-        try {
-            Thread.sleep(10000000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        streamProcessor.stop();
+//        String url1 = "rtsp://127.0.0.1:7554/live/30-2";
+//        String url2 = "rtmp://127.0.0.1:7935/live/test3";
+//
+//        String url3 = "rtsp://127.0.0.1:7554/live/30";
+//        String url4 = "rtmp://127.0.0.1:7935/live/test4";
+//        streamProcessor.init(url1,url2);
+//        streamProcessor.start();
+//        streamProcessor2.init(url3,url4);
+//        streamProcessor2.start();
+//        try {
+//            Thread.sleep(10000000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//        streamProcessor.stop();
     }
 }

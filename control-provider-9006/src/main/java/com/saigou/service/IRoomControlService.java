@@ -5,7 +5,7 @@ import com.saigou.entity.RoomControl;
 import java.util.List;
 
 public interface IRoomControlService{
-    int add(RoomControl roomControl);
+    int create(RoomControl roomControl);
     int delete(Long id);
     int deleteByRoomId(Long roomId);
     int deleteByControlId(Long controlId);

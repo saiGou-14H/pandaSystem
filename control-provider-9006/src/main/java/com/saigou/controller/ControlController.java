@@ -26,17 +26,19 @@ public class ControlController {
     private final IControlService iControlService;
     private final IRoomControlService iRoomControlService;
 
-    @PostMapping("/add")
+    @PostMapping("/create")
     @Operation(summary = "添加布控",description = "添加布控")
     @Transactional
-    public int add(@RequestBody ControlDto controlDto){
+    public Long create(@RequestBody ControlDto controlDto){
         Control control = new Control();
         BeanUtils.copyProperties(controlDto,control);
-        iControlService.add(control);
+        iControlService.create(control);
         RoomControl roomControl = new RoomControl();
         roomControl.setRoomId(controlDto.getRoomId());
         roomControl.setControlId(control.getId());
-        return iRoomControlService.add(roomControl);
+        iRoomControlService.create(roomControl);
+        log.info("新增布控id：{}",control.getId());
+        return control.getId();
     }
 
     @DeleteMapping("/delete/{id}")
@@ -53,7 +55,7 @@ public class ControlController {
         return iControlService.update(control);
     }
 
-    @GetMapping("/getById/{id}")
+    @GetMapping("/get/{id}")
     @Operation(summary = "查询",description = "根据id查询布控")
     public ControlDto getById(@PathVariable("id") Long id){
         return iControlService.getById(id);

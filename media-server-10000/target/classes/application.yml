@@ -37,7 +37,7 @@ media: ##目前只增加部分重要配置，更多配置请自行配置
   log_path: ./media
 spring:
   application:
-    name: meida-server-10000
+    name: media-server-10000
   cloud:
     nacos:
       server-addr: scnu.saigou.work:8848

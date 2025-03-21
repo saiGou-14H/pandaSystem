@@ -16,7 +16,7 @@ import java.util.List;
 public class IRoomControlServiceImpl extends ServiceImpl<IRoomControllerMapper, RoomControl> implements IRoomControlService {
     private final IRoomControllerMapper roomControllerMapper;
     @Override
-    public int add(RoomControl roomControl) {
+    public int create(RoomControl roomControl) {
         return roomControllerMapper.insert(roomControl);
     }
 
