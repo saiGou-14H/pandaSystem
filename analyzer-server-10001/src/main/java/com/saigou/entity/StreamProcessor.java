@@ -1,7 +1,5 @@
-package com.saigou.util;
+package com.saigou.entity;
 
-import com.saigou.entity.FrameWrapper;
-import com.saigou.entity.ImageWrapper;
 import com.saigou.properties.AnalyzerProperties;
 import com.saigou.properties.PullProperties;
 import com.saigou.properties.PushProperties;
@@ -9,13 +7,9 @@ import com.saigou.thread.AnalyzerThread;
 import com.saigou.thread.EncodeThread;
 import com.saigou.thread.PullStreamThread;
 import com.saigou.thread.PushStreamThread;
-import lombok.Data;
+import com.saigou.util.RedisUtil;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.bytedeco.javacv.Frame;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -33,22 +27,24 @@ public class StreamProcessor {
     EncodeThread encodeThread;
     AnalyzerThread analyzerThread;
     PushStreamThread pushStreamThread;
+    RedisUtil redisUtil;
     @Getter
-    private Long controlId;
+    public Long controlId;
     @Getter
-    private String pullUrl;
+    public String pullUrl;
     @Getter
-    private String rtmpPushUrl;
+    public String rtmpPushUrl;
     @Getter
-    private String httpPushUrl;
+    public String httpPushUrl;
     @Getter
-    private boolean isAlive = false;
+    public boolean isAlive = false;
 
 
-    public void initConfig(PullProperties pullProperties, AnalyzerProperties analyzerProperties, PushProperties pushProperties) {
+    public void initConfig(PullProperties pullProperties, AnalyzerProperties analyzerProperties, PushProperties pushProperties, RedisUtil redisUtil) {
         this.pullProperties = pullProperties;
         this.analyzerProperties = analyzerProperties;
         this.pushProperties = pushProperties;
+        this.redisUtil = redisUtil;
     }
     public void init(Long id,String pullUrl,String rtmpPushUrl ,String httpPushUrl) {
         this.controlId = id;
@@ -61,7 +57,7 @@ public class StreamProcessor {
     public void start() {
         this.pullStreamThread = new PullStreamThread(pullUrl,pullframeQueue,pullProperties);
         this.encodeThread = new EncodeThread(pullframeQueue,imageQueue,pushFrameQueue,keyList);
-        this.analyzerThread = new AnalyzerThread(imageQueue,analyzerCache,analyzerProperties);
+        this.analyzerThread = new AnalyzerThread(imageQueue,analyzerCache,analyzerProperties,redisUtil,controlId);
         this.pushStreamThread = new PushStreamThread(rtmpPushUrl, pullStreamThread.grabber,pushFrameQueue,analyzerCache,keyList,pushProperties);
         pullStreamThread.start();
         encodeThread.start();

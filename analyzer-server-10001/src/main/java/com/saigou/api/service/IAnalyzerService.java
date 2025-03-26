@@ -1,7 +1,6 @@
 package com.saigou.api.service;
 
-import com.saigou.util.ResponseVO;
-import com.saigou.util.StreamProcessor;
+import com.saigou.entity.StreamProcessor;
 
 import java.util.List;
 

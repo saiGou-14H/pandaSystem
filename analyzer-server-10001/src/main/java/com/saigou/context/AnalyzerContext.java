@@ -3,11 +3,13 @@ package com.saigou.context;
 import com.saigou.properties.AnalyzerProperties;
 import com.saigou.properties.PullProperties;
 import com.saigou.properties.PushProperties;
-import com.saigou.util.StreamProcessor;
+import com.saigou.entity.StreamProcessor;
+import com.saigou.util.JwtUtil;
+import com.saigou.util.RedisUtil;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -35,6 +37,7 @@ public class AnalyzerContext {
     private final AnalyzerProperties analyzerProperties;
     private final PushProperties pushProperties;
     private final Map<Long, StreamProcessor> streamProcessorMap = new HashMap<>();
+    private final RedisUtil redisUtil;
 
 
     public List<StreamProcessor> getAllStreamProcessor() {
@@ -50,7 +53,7 @@ public class AnalyzerContext {
             return streamProcessorMap.get(id);
         }
         StreamProcessor streamProcessor = new StreamProcessor();
-        streamProcessor.initConfig(pullProperties,analyzerProperties,pushProperties);
+        streamProcessor.initConfig(pullProperties,analyzerProperties,pushProperties,redisUtil);
         String rtmpPushUrl = "rtmp://"+DEFAULT_HOST+":"+DEFAULT_RTMP_PORT+"/"+APP+"/"+stream;
         String httpPushUrl = "http://"+DEFAULT_HOST+":"+DEFAULT_HTTP_PORT+"/"+APP+"/"+stream+".live.flv";
         streamProcessor.init(id,url,rtmpPushUrl,httpPushUrl);

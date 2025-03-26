@@ -1,7 +1,6 @@
 package com.saigou;
 
-import com.saigou.util.StreamProcessor;
-import org.bytedeco.javacv.*;
+import com.saigou.entity.StreamProcessor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

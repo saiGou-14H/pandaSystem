@@ -1,8 +1,7 @@
 package com.saigou.api.controller;
 
 import com.saigou.api.service.IAnalyzerService;
-import com.saigou.util.ResponseVO;
-import com.saigou.util.StreamProcessor;
+import com.saigou.entity.StreamProcessor;
 import com.saigou.vo.StreamProcessorVO;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;

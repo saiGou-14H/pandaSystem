@@ -1,11 +1,15 @@
 package com.saigou.thread;
 
+import cn.hutool.json.JSON;
+import cn.hutool.json.JSONUtil;
 import com.google.protobuf.ByteString;
 import com.saigou.draw.Draw;
 import com.saigou.entity.FrameWrapper;
 import com.saigou.entity.ImageWrapper;
 import com.saigou.grpc.*;
 import com.saigou.properties.AnalyzerProperties;
+import com.saigou.util.ProtoBufUtil;
+import com.saigou.util.RedisUtil;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
@@ -19,8 +23,11 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
 import static com.saigou.thread.EncodeThread.dencodeJpeg;
+import static com.saigou.util.proto2javabean.proto2javabean;
+
 public class AnalyzerThread extends Thread implements StreamObserver<AnalysisResult> {
     public LinkedBlockingQueue<ImageWrapper> imageQueue;
     public ConcurrentSkipListMap<Long, FrameWrapper> resultCache;
@@ -30,13 +37,17 @@ public class AnalyzerThread extends Thread implements StreamObserver<AnalysisRes
     private final ExecutorService frameProcessorExecutor = Executors.newFixedThreadPool(16);
     public OpenCVFrameConverter.ToMat converter;
     private AnalyzerProperties analyzerProperties;
+    private RedisUtil redisUtil;
+    private Long controlId;
     public AnalyzerThread(LinkedBlockingQueue<ImageWrapper> imageQueue,
                           ConcurrentSkipListMap<Long,FrameWrapper> resultCache,
-                          AnalyzerProperties analyzerProperties){
+                          AnalyzerProperties analyzerProperties,RedisUtil redisUtil,Long controlId){
         this.resultCache = resultCache;
         this.imageQueue = imageQueue;
         converter = new OpenCVFrameConverter.ToMat();
         this.analyzerProperties = analyzerProperties;
+        this.redisUtil = redisUtil;
+        this.controlId = controlId;
         init();
     }
     public void init(){
@@ -80,6 +91,7 @@ public class AnalyzerThread extends Thread implements StreamObserver<AnalysisRes
             try {
                 // jpeg解码
                 frameProcessorExecutor.submit(() -> {
+                    redisUtil.hset("frame:result:"+controlId,String.valueOf(analysisResult.getTimestamp()), proto2javabean(analysisResult));
                     Mat mat = dencodeJpeg(imageData);//释放该资源会导致帧顺序错误
                     List<FaceBox> faceBoxes = null;
                     List<PersonBox> expressions = null;

@@ -2,7 +2,7 @@ package com.saigou.api.service.Impl;
 
 import com.saigou.api.service.IAnalyzerService;
 import com.saigou.context.AnalyzerContext;
-import com.saigou.util.StreamProcessor;
+import com.saigou.entity.StreamProcessor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
