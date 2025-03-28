@@ -8,19 +8,8 @@ import org.springframework.messaging.SubscribableChannel; /**
  */
 public interface CustomSinkChannel {
 
-    String FACE_INPUT = "face_input";
+    String ANALYZER_INPUT = "analyzer_output";
 
-    String HUMAN_INPUT = "human_input";
-
-    String VEHICLE_INPUT = "vehicle_input";
-
-    @Input(FACE_INPUT)
+    @Input(ANALYZER_INPUT)
     SubscribableChannel faceInput();
-
-    @Input(HUMAN_INPUT)
-    SubscribableChannel humanInput();
-
-    @Input(VEHICLE_INPUT)
-    SubscribableChannel vehicleInput();
-
 }

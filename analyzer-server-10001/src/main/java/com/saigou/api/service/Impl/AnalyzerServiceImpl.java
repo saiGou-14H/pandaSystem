@@ -10,7 +10,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Service
-public class IAnalyzerServiceImpl implements IAnalyzerService {
+public class AnalyzerServiceImpl implements IAnalyzerService {
 
     private final AnalyzerContext analyzerContext;
     @Override

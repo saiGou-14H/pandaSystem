@@ -9,13 +9,13 @@ import java.util.List;
 @Data
 public class AnalysisResult implements Serializable,Comparable<AnalysisResult> {
     private long timestamp;
-    private List<FaceBox> face_boxes;
-    private List<PersonBox> person_boxes;
+    private List<FaceBox> faceBoxes;
+    private List<PersonBox> personBoxes;
     private String data;
-    private byte[] image_data;
+    private byte[] imageData;
 
     @Override
     public int compareTo(@NotNull AnalysisResult o) {
-        return o.getTimestamp()>this.getTimestamp()?1:-1;
+        return o.getTimestamp()<this.getTimestamp()?1:-1;
     }
 }

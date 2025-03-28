@@ -2,16 +2,19 @@ package com.saigou.thread;
 
 import com.saigou.properties.PullProperties;
 import com.saigou.util.Utils;
+import lombok.Data;
 import lombok.SneakyThrows;
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.FrameGrabber;
 
+import java.time.LocalDateTime;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class PullStreamThread extends Thread {
     public FFmpegFrameGrabber grabber;
     public LinkedBlockingQueue<Frame> frameQueue;
+    public boolean isAlive = false;
     @SneakyThrows
     public PullStreamThread(String url,
                             LinkedBlockingQueue<Frame> frameQueue,
@@ -27,9 +30,11 @@ public class PullStreamThread extends Thread {
     }
     @SneakyThrows
     public void run() {
+        isAlive = true;
         Frame frame;
         while (!isInterrupted() && (frame = grabber.grab()) != null) {
             if (frame.image != null) {
+                frame.timestamp = System.currentTimeMillis();
                 Frame clonedFrame = Utils.createDeepCopy(frame);
                 if (frameQueue.remainingCapacity() > 10) {
                     frameQueue.offer(clonedFrame);
@@ -40,6 +45,7 @@ public class PullStreamThread extends Thread {
                 }
             }
         }
+        isAlive = false;
     }
 
     @Override

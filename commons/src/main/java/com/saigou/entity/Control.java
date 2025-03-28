@@ -1,54 +1,55 @@
 package com.saigou.entity;
 
-        import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.annotation.*;
 
-        import java.io.Serializable;
-        import java.time.LocalDateTime;
-        import io.swagger.annotations.ApiModel;
-        import io.swagger.annotations.ApiModelProperty;
-        import lombok.Data;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
-        /**
-        * <p>
-* 
-* </p>
-        *
-        * @author saigou
-        * @since 2025-03-13
-        */
-        @Data
-        @TableName("control")
-        @ApiModel(value = "Control对象", description = "")
-        public class Control implements Serializable {
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
-        private static final long serialVersionUID = 1L;
+/**
+ * <p>
+ *
+ * </p>
+ *
+ * @author saigou
+ * @since 2025-03-13
+ */
+@Data
+@TableName("control")
+@ApiModel(value = "Control对象", description = "")
+public class Control implements Serializable {
 
-        @ApiModelProperty("雪花ID")
-        @TableId(value = "id", type = IdType.ASSIGN_ID)
-        private Long id;
+    private static final long serialVersionUID = 1L;
 
-        @ApiModelProperty("布控推流地址")
-        @TableField("url")
-        private String url;
+    @ApiModelProperty("雪花ID")
+    @TableId(value = "id", type = IdType.ASSIGN_ID)
+    private Long id;
 
-        @ApiModelProperty("视频帧率")
-        @TableField("fps")
-        private Double fps;
+    @ApiModelProperty("布控推流地址")
+    @TableField("url")
+    private String url;
 
-        @ApiModelProperty("布控状态")
-        @TableField("status")
-        private String status;
+    @ApiModelProperty("视频帧率")
+    @TableField("fps")
+    private Double fps;
 
-        @ApiModelProperty("布控添加时间")
-        @TableField(value = "create_time", fill = FieldFill.INSERT)
-        private LocalDateTime createTime;
+    @ApiModelProperty("布控状态")
+    @TableField("status")
+    private String status;
 
-        @ApiModelProperty("逻辑删除")
-        @TableField("deleted")
-        private Boolean deleted;
+    @ApiModelProperty("布控添加时间")
+    @TableField(value = "create_time", fill = FieldFill.INSERT)
+    private LocalDateTime createTime;
+
+    @ApiModelProperty("逻辑删除")
+    @TableField("deleted")
+    private Boolean deleted;
 
 
-        }
+}
 
 
 

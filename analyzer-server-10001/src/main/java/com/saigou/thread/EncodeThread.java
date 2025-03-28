@@ -18,6 +18,8 @@ public class EncodeThread extends Thread{
     public LinkedBlockingQueue<ImageWrapper> imageQueue;
     public CopyOnWriteArrayList<Long> keyList;
     public LinkedBlockingQueue<Frame> pushFrameQueue;
+    public ThreadPoolExecutor encodingManager;
+    public boolean isAlive = false;
     private static final IntPointer jpegParams = new IntPointer(
             opencv_imgcodecs.IMWRITE_JPEG_QUALITY, 80//压缩率80%
     );
@@ -37,16 +39,17 @@ public class EncodeThread extends Thread{
             return ByteString.copyFrom(buffer.getStringBytes());
         }
     }
-    public EncodeThread(LinkedBlockingQueue<Frame> frameQueue, LinkedBlockingQueue<ImageWrapper> imageQueue, LinkedBlockingQueue<Frame> pushFrameQueue, CopyOnWriteArrayList<Long> keyList) {
+    public EncodeThread(LinkedBlockingQueue<Frame> frameQueue, LinkedBlockingQueue<ImageWrapper> imageQueue,
+                        LinkedBlockingQueue<Frame> pushFrameQueue, CopyOnWriteArrayList<Long> keyList,
+                        ThreadPoolExecutor encodingManager) {
         this.frameQueue = frameQueue;
         this.imageQueue = imageQueue;
         this.pushFrameQueue = pushFrameQueue;
         this.keyList = keyList;
+        this.encodingManager = encodingManager;
     }
     int count = 15;
     int frameCount = 0;
-
-    private final ExecutorService frameProcessorExecutor = Executors.newFixedThreadPool(16);
     private void handleFrame(Frame frame) {
         try (OpenCVFrameConverter.ToMat converter = new OpenCVFrameConverter.ToMat();
              Mat mat = converter.convert(frame);// 缩放图像
@@ -70,12 +73,13 @@ public class EncodeThread extends Thread{
     }
     @Override
     public void run() {
+        isAlive = true;
         while (!isInterrupted()){
             try {
                 Frame frame = frameQueue.poll(5, TimeUnit.MILLISECONDS);
                 if (frame != null && frame.image != null) {
                         if(frameCount%count==0){
-                            frameProcessorExecutor.submit(() -> {
+                            encodingManager.submit(() -> {
                                 handleFrame(frame);
                             });
                         }
@@ -86,17 +90,10 @@ public class EncodeThread extends Thread{
                 interrupt();
             }
         }
+        isAlive = false;
     }
     @Override
     public void interrupt() {
         super.interrupt();
-        frameProcessorExecutor.shutdown(); // 温和关闭
-        try {
-            if (!frameProcessorExecutor.awaitTermination(2, TimeUnit.SECONDS)) {
-                frameProcessorExecutor.shutdownNow();
-            }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
     }
 }

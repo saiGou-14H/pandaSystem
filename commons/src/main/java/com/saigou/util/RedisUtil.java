@@ -20,6 +20,16 @@ public final class RedisUtil {
  
     // =============================common============================
     /**
+     * 获取某个业务的所有key
+     * @param keyPrefix 业务前缀
+     */
+    public Set<String> getKeys(String keyPrefix) {
+        Set<String> keys = redisTemplate.keys(keyPrefix + "*");
+        return keys;
+    }
+
+
+    /**
      * 指定缓存失效时间
      * @param key  键
      * @param time 时间(秒)

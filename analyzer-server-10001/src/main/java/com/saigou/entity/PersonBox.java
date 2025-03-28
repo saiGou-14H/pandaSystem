@@ -8,8 +8,8 @@ public class PersonBox {
     private Point minPoint;
     private Point maxPoint;
     private float score;
-    private long track_id;
-    private long attitude_id;
-    private String expression_feature;
+    private long trackId;
+    private long attitudeId;
+    private String expressionFeature;
     private String data;
 }

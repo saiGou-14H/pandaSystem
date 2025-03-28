@@ -11,20 +11,10 @@ import org.springframework.messaging.SubscribableChannel;
  */
 public interface CustomSourceChannel {
 
-    String FACE_OUTPUT = "face_output";
+    String ANALYZER_OUTPUT = "analyzer_output";
 
-    String HUMAN_OUTPUT = "human_output";
-
-    String VEHICLE_OUTPUT = "vehicle_output";
-
-    @Output(FACE_OUTPUT)
-    MessageChannel faceOutput();
-
-    @Output(HUMAN_OUTPUT)
-    MessageChannel humanOutput();
-
-    @Output(VEHICLE_OUTPUT)
-    MessageChannel vehicleOutput();
+    @Output(ANALYZER_OUTPUT)
+    MessageChannel analyzerOutput();
 
 }
 

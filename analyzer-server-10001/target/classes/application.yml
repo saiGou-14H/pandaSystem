@@ -55,9 +55,10 @@ spring:
     password: Qq70852096..
   data:
     redis:
-      host: scnu.saigou.work
+#      host: scnu.saigou.work
+      host: 127.0.0.1
       port: 6379
-      password: 70852096
+#      password: 70852096
 config:
   pull:
     maxImageWidth: 1920

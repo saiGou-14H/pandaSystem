@@ -12,17 +12,21 @@ import org.bytedeco.ffmpeg.global.avcodec;
 import org.bytedeco.javacv.*;
 import org.bytedeco.opencv.global.opencv_core;
 import org.bytedeco.opencv.opencv_core.Mat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.*;
 
 public class PushStreamThread extends Thread{
+    private static final Logger log = LoggerFactory.getLogger(PushStreamThread.class);
     public FFmpegFrameGrabber grabber;
     public FFmpegFrameRecorder recorder;
     public LinkedBlockingQueue<Frame> pushFrameQueue;
     public ConcurrentSkipListMap<Long, FrameWrapper> resultCache;
     public CopyOnWriteArrayList<Long> keyList;
+    public boolean isAlive = false;
 
     @SneakyThrows
     public PushStreamThread(String url, FFmpegFrameGrabber grabber, LinkedBlockingQueue<Frame> pushFrameQueue,
@@ -64,65 +68,71 @@ public class PushStreamThread extends Thread{
 
     public OpenCVFrameConverter.ToMat converter = new OpenCVFrameConverter.ToMat();
 
-    @SneakyThrows
     public void run(){
+        isAlive = true;
         final long MAX_WAIT_MS = (long) ((1000/recorder.getFrameRate())-10-5);// 最大等待结果时间
         long startTime = System.currentTimeMillis();
         int frameCount = 0;
-        while (resultCache.isEmpty()){
-            Thread.sleep(20); // 避免持续轮询，减少 CPU 占用
-        }
         long oldtimestamp=-1;
         List<FaceBox> faceBoxList= null;
         List<PersonBox> personBoxList= null;
-        while (!isInterrupted()) {
-            Frame frame = pushFrameQueue.poll(5, TimeUnit.MILLISECONDS);
-            if(frame != null && frame.timestamp <= oldtimestamp){
-                System.out.println("时间戳回退,丢弃帧："+oldtimestamp+"->"+frame.timestamp);
+        try{
+            while (resultCache.isEmpty()){
+                Thread.sleep(20); // 避免持续轮询，减少 CPU 占用
             }
-            if (frame != null && frame.image != null && frame.timestamp > oldtimestamp){
-                long startWait = System.currentTimeMillis();
-                while (System.currentTimeMillis() - startWait < MAX_WAIT_MS) {
-                    FrameWrapper result = resultCache.get(frame.timestamp);
-                    if (result != null) break;
+            while (!isInterrupted()) {
+                Frame frame = pushFrameQueue.poll(5, TimeUnit.MILLISECONDS);
+                if(frame != null && frame.timestamp <= oldtimestamp){
+                    System.out.println("时间戳回退,丢弃帧："+oldtimestamp+"->"+frame.timestamp);
                 }
-                FrameWrapper result = CacheFrameHandler(frame.timestamp);
-                if (result != null) {
-                    faceBoxList = result.faceBoxes;
-                    personBoxList = result.PersonBoxs;
-                    recorder.record(result.frame);
-                    oldtimestamp=result.frame.timestamp;
-                    Utils.safeCloseFrame(result.frame);
-                } else {
-                    if(faceBoxList!=null||personBoxList!=null){// 用上一次分析结果绘制人脸框和人体关键点
-                        Mat mat = converter.convert(frame);
-                        if(faceBoxList!=null){
-                            for (FaceBox faceBox : faceBoxList) {
-                                Draw.drawRectangle(mat, faceBox.getMinPoint(), faceBox.getMaxPoint());
-                                Draw.drawText(mat, faceBox.getExpressionFeature(), faceBox.getMinPoint());
-                            }
-                        }
-                        if(personBoxList!=null){
-                            for (PersonBox personBox : personBoxList) {
-                                List<Point> points = personBox.getPointsList();
-                                Draw.drawPersonPose(mat, points);
-                            }
-                        }
-                        frame = converter.convert(mat);
+                if (frame != null && frame.image != null && frame.timestamp > oldtimestamp){
+                    long startWait = System.currentTimeMillis();
+                    while (System.currentTimeMillis() - startWait < MAX_WAIT_MS) {
+                        FrameWrapper result = resultCache.get(frame.timestamp);
+                        if (result != null) break;
                     }
-                    recorder.record(frame);
-                    oldtimestamp=frame.timestamp;
+                    FrameWrapper result = CacheFrameHandler(frame.timestamp);
+                    if (result != null) {
+                        faceBoxList = result.faceBoxes;
+                        personBoxList = result.PersonBoxs;
+                        recorder.record(result.frame);
+                        oldtimestamp=result.frame.timestamp;
+                        Utils.safeCloseFrame(result.frame);
+                    } else {
+                        if(faceBoxList!=null||personBoxList!=null){// 用上一次分析结果绘制人脸框和人体关键点
+                            Mat mat = converter.convert(frame);
+                            if(faceBoxList!=null){
+                                for (FaceBox faceBox : faceBoxList) {
+                                    Draw.drawRectangle(mat, faceBox.getMinPoint(), faceBox.getMaxPoint());
+                                    Draw.drawText(mat, faceBox.getExpressionFeature(), faceBox.getMinPoint());
+                                }
+                            }
+                            if(personBoxList!=null){
+                                for (PersonBox personBox : personBoxList) {
+                                    List<Point> points = personBox.getPointsList();
+                                    Draw.drawPersonPose(mat, points);
+                                }
+                            }
+                            frame = converter.convert(mat);
+                        }
+                        recorder.record(frame);
+                        oldtimestamp=frame.timestamp;
+                    }
+                    frameCount++;
+                    // 每 5 秒输出一次帧率
+                    if (System.currentTimeMillis() - startTime > 5000) {
+                        double fps = frameCount / 5.0;
+                        System.out.printf("实际推流帧率: %.2f FPS\n", fps);
+                        frameCount = 0;
+                        startTime = System.currentTimeMillis();
+                    }
+                    Utils.safeCloseFrame(frame);
                 }
-                frameCount++;
-                // 每 5 秒输出一次帧率
-                if (System.currentTimeMillis() - startTime > 5000) {
-                    double fps = frameCount / 5.0;
-                    System.out.printf("实际推流帧率: %.2f FPS\n", fps);
-                    frameCount = 0;
-                    startTime = System.currentTimeMillis();
-                }
-                Utils.safeCloseFrame(frame);
             }
+        }catch (Exception e){
+//            log.error("推流异常",e);
+        }finally {
+            isAlive = false;
         }
     }
 

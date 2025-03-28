@@ -1,5 +1,6 @@
 package com.saigou.entity;
 
+import com.saigou.api.service.IRedisAnalyzerResultService;
 import com.saigou.properties.AnalyzerProperties;
 import com.saigou.properties.PullProperties;
 import com.saigou.properties.PushProperties;
@@ -14,6 +15,8 @@ import org.bytedeco.javacv.Frame;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+
 public class StreamProcessor {
     private LinkedBlockingQueue<Frame> pullframeQueue = new LinkedBlockingQueue<>(70);
     private LinkedBlockingQueue<ImageWrapper> imageQueue = new LinkedBlockingQueue<>(70);
@@ -27,7 +30,9 @@ public class StreamProcessor {
     EncodeThread encodeThread;
     AnalyzerThread analyzerThread;
     PushStreamThread pushStreamThread;
-    RedisUtil redisUtil;
+    IRedisAnalyzerResultService iRedisAnalyzerResultService;
+    ThreadPoolExecutor encodingManager;
+    ThreadPoolExecutor dencodingManager;
     @Getter
     public Long controlId;
     @Getter
@@ -40,11 +45,15 @@ public class StreamProcessor {
     public boolean isAlive = false;
 
 
-    public void initConfig(PullProperties pullProperties, AnalyzerProperties analyzerProperties, PushProperties pushProperties, RedisUtil redisUtil) {
+    public void initConfig(PullProperties pullProperties, AnalyzerProperties analyzerProperties,
+                           PushProperties pushProperties, IRedisAnalyzerResultService iRedisAnalyzerResultService,
+                           ThreadPoolExecutor encodingManager,ThreadPoolExecutor dencodingManager) {
         this.pullProperties = pullProperties;
         this.analyzerProperties = analyzerProperties;
         this.pushProperties = pushProperties;
-        this.redisUtil = redisUtil;
+        this.iRedisAnalyzerResultService = iRedisAnalyzerResultService;
+        this.encodingManager = encodingManager;
+        this.dencodingManager = dencodingManager;
     }
     public void init(Long id,String pullUrl,String rtmpPushUrl ,String httpPushUrl) {
         this.controlId = id;
@@ -56,8 +65,8 @@ public class StreamProcessor {
 
     public void start() {
         this.pullStreamThread = new PullStreamThread(pullUrl,pullframeQueue,pullProperties);
-        this.encodeThread = new EncodeThread(pullframeQueue,imageQueue,pushFrameQueue,keyList);
-        this.analyzerThread = new AnalyzerThread(imageQueue,analyzerCache,analyzerProperties,redisUtil,controlId);
+        this.encodeThread = new EncodeThread(pullframeQueue,imageQueue,pushFrameQueue,keyList,encodingManager);
+        this.analyzerThread = new AnalyzerThread(imageQueue,analyzerCache,analyzerProperties,iRedisAnalyzerResultService,controlId,dencodingManager);
         this.pushStreamThread = new PushStreamThread(rtmpPushUrl, pullStreamThread.grabber,pushFrameQueue,analyzerCache,keyList,pushProperties);
         pullStreamThread.start();
         encodeThread.start();
