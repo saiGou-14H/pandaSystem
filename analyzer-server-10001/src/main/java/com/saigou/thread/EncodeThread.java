@@ -10,10 +10,13 @@ import org.bytedeco.opencv.global.opencv_imgcodecs;
 import org.bytedeco.opencv.global.opencv_imgproc;
 import org.bytedeco.opencv.opencv_core.Mat;
 import org.bytedeco.opencv.opencv_core.Size;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.*;
 
 public class EncodeThread extends Thread{
+    private static final Logger log = LoggerFactory.getLogger(EncodeThread.class);
     public LinkedBlockingQueue<Frame> frameQueue;
     public LinkedBlockingQueue<ImageWrapper> imageQueue;
     public CopyOnWriteArrayList<Long> keyList;
@@ -74,23 +77,24 @@ public class EncodeThread extends Thread{
     @Override
     public void run() {
         isAlive = true;
-        while (!isInterrupted()){
-            try {
+        try{
+            while (!isInterrupted()){
                 Frame frame = frameQueue.poll(5, TimeUnit.MILLISECONDS);
                 if (frame != null && frame.image != null) {
-                        if(frameCount%count==0){
-                            encodingManager.submit(() -> {
-                                handleFrame(frame);
-                            });
-                        }
+                    if(frameCount%count==0){
+                        encodingManager.submit(() -> {
+                            handleFrame(frame);
+                        });
+                    }
                     pushFrameQueue.offer(frame);
                     frameCount++;
                 }
-            } catch (InterruptedException e) {
-                interrupt();
             }
+        }catch (Exception e){
+//            log.error("编码线程异常",e);
+        }finally {
+            isAlive = false;
         }
-        isAlive = false;
     }
     @Override
     public void interrupt() {

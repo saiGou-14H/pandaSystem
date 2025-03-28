@@ -7,11 +7,14 @@ import lombok.SneakyThrows;
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.FrameGrabber;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class PullStreamThread extends Thread {
+    private static final Logger log = LoggerFactory.getLogger(PullStreamThread.class);
     public FFmpegFrameGrabber grabber;
     public LinkedBlockingQueue<Frame> frameQueue;
     public boolean isAlive = false;
@@ -32,20 +35,25 @@ public class PullStreamThread extends Thread {
     public void run() {
         isAlive = true;
         Frame frame;
-        while (!isInterrupted() && (frame = grabber.grab()) != null) {
-            if (frame.image != null) {
-                frame.timestamp = System.currentTimeMillis();
-                Frame clonedFrame = Utils.createDeepCopy(frame);
-                if (frameQueue.remainingCapacity() > 10) {
-                    frameQueue.offer(clonedFrame);
-                } else {
-                    Frame oldFrame = frameQueue.poll();
-                    Utils.safeCloseFrame(oldFrame);
-                    frameQueue.offer(clonedFrame);
+        try{
+            while (!isInterrupted() && (frame = grabber.grab()) != null) {
+                if (frame.image != null) {
+                    frame.timestamp = System.currentTimeMillis();
+                    Frame clonedFrame = Utils.createDeepCopy(frame);
+                    if (frameQueue.remainingCapacity() > 10) {
+                        frameQueue.offer(clonedFrame);
+                    } else {
+                        Frame oldFrame = frameQueue.poll();
+                        Utils.safeCloseFrame(oldFrame);
+                        frameQueue.offer(clonedFrame);
+                    }
                 }
             }
+        }catch (Exception e){
+//            log.error("拉流线程异常",e);
+        }finally {
+            isAlive = false;
         }
-        isAlive = false;
     }
 
     @Override

@@ -1,7 +1,5 @@
 package com.saigou.thread;
 
-import cn.hutool.json.JSON;
-import cn.hutool.json.JSONUtil;
 import com.google.protobuf.ByteString;
 import com.saigou.api.service.IRedisAnalyzerResultService;
 import com.saigou.draw.Draw;
@@ -10,8 +8,6 @@ import com.saigou.entity.ImageWrapper;
 import com.saigou.grpc.*;
 import com.saigou.properties.AnalyzerProperties;
 import com.saigou.util.ProtoBufUtil;
-import com.saigou.util.RedisUtil;
-import com.saigou.util.Utils;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;

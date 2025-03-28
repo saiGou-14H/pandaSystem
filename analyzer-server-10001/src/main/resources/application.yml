@@ -15,19 +15,23 @@ spring:
       discovery:
         group: pandaSystem
     stream:
+      bindings:
+        output:
+          destination: analyzer_topic #消息发往的目的地
+          content-type: application/json #消息发送的格式，这里使用 text。发送字符串消息的时候需要配置，默认是 json格式 text/plain
+        input:
+          destination: analyzer_topic #目的地
+          group: analyzer_consumer_group #消费者分组
+      default-binder: kafka
       kafka:
         binder:
           brokers: scnu.saigou.work:7777
           auto-create-topics: true #设置自动创建Topic
           required-acks: 1 # 0-不等待任何确认。1-等待 leader 应答（默认）。all-等待所有 leader 和 follower 应答。
-            # Binding 配置项，对应 BindingProperties Map
-          bindings:
-            analyzer_output:
-              destination: analyzer_topic #消息发往的目的地
-              content-type: application/json #消息发送的格式，这里使用 text。发送字符串消息的时候需要配置，默认是 json格式 text/plain
-            analyzer_input:
-              destination: analyzer_topic #目的地
-              group: analyzer_consumer_group #消费者分组
+          # Binding 配置项，对应 BindingProperties Map
+
+
+
 
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource

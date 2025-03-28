@@ -2,11 +2,13 @@ package com.saigou.api.controller;
 
 import com.saigou.api.service.IAnalyzerService;
 import com.saigou.entity.StreamProcessor;
+import com.saigou.util.KafkaSendService;
 import com.saigou.vo.StreamProcessorVO;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -56,6 +58,13 @@ public class AnalyzerController {
     @GetMapping("/get/{id}")
     public StreamProcessor getById(@PathVariable("id") Long id) {
         return analyzerService.getById(id);
+    }
+
+    @Autowired
+    private KafkaSendService kafkaSendService;
+    @GetMapping("/send")
+    public void send() {
+        kafkaSendService.send("hello");
     }
 
 }

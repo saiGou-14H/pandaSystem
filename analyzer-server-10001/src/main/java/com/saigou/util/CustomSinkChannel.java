@@ -8,8 +8,8 @@ import org.springframework.messaging.SubscribableChannel; /**
  */
 public interface CustomSinkChannel {
 
-    String ANALYZER_INPUT = "analyzer_output";
+    String ANALYZER_INPUT = "analyzer_topic";
 
     @Input(ANALYZER_INPUT)
-    SubscribableChannel faceInput();
+    SubscribableChannel analyzerInput();
 }

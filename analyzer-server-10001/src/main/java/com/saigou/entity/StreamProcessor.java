@@ -76,10 +76,10 @@ public class StreamProcessor {
     }
 
     public void stop() {
-        pushStreamThread.interrupt();
-        analyzerThread.interrupt();
-        encodeThread.interrupt();
         pullStreamThread.interrupt();
+        encodeThread.interrupt();
+        analyzerThread.interrupt();
+        pushStreamThread.interrupt();
         isAlive = false;
     }
 
