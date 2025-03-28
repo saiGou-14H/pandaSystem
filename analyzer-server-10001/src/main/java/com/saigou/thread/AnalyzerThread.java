@@ -20,17 +20,10 @@ import org.bytedeco.javacv.OpenCVFrameConverter;
 import org.bytedeco.opencv.opencv_core.Mat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import javax.annotation.Resource;
-import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
-import java.util.stream.Collectors;
 
 import static com.saigou.thread.EncodeThread.dencodeJpeg;
-import static com.saigou.util.proto2javabean.proto2javabean;
 
 public class AnalyzerThread extends Thread implements StreamObserver<AnalysisResult> {
     private static final Logger log = LoggerFactory.getLogger(AnalyzerThread.class);
