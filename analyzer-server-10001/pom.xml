@@ -8,9 +8,7 @@
         <artifactId>pandaSystem</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-
     <artifactId>analyzer-server-10001</artifactId>
-
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>

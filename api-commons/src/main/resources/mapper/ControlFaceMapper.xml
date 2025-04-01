@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.saigou.module.mapper.ControlFaceMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.saigou.module.entity.ControlFace">
+        <id column="id" property="id" />
+        <result column="face_id" property="faceId" />
+        <result column="control_id" property="controlId" />
+        <result column="bbox_min_x" property="bboxMinX" />
+        <result column="bbox_min_y" property="bboxMinY" />
+        <result column="bbox_max_x" property="bboxMaxX" />
+        <result column="bbox_max_y" property="bboxMaxY" />
+        <result column="score" property="score" />
+        <result column="track_id" property="trackId" />
+        <result column="expression_type" property="expressionType" />
+        <result column="feature_vector" property="featureVector" />
+        <result column="attributes" property="attributes" />
+    </resultMap>
+
+</mapper>

@@ -1,11 +1,13 @@
 package com.saigou.context;
 
+import com.saigou.api.service.IMysqlAnalyzerService;
 import com.saigou.api.service.IRedisAnalyzerResultService;
 import com.saigou.properties.AnalyzerProperties;
 import com.saigou.properties.PullProperties;
 import com.saigou.properties.PushProperties;
 import com.saigou.entity.StreamProcessor;
 import com.saigou.util.JwtUtil;
+import com.saigou.util.KafkaSendService;
 import com.saigou.util.RedisUtil;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +46,7 @@ public class AnalyzerContext {
     private final PushProperties pushProperties;
     private final Map<Long, StreamProcessor> streamProcessorMap = new HashMap<>();
     private final IRedisAnalyzerResultService iRedisAnalyzerResultService;
+    private final KafkaSendService kafkaSendService;
     private final ThreadPoolExecutor encodingManager = new ThreadPoolExecutor(17, 100,
             30, TimeUnit.SECONDS, new LinkedBlockingQueue<>(100), new ThreadPoolExecutor.DiscardOldestPolicy());
     private final ThreadPoolExecutor dencodingManager = new ThreadPoolExecutor(17, 100,
@@ -63,7 +66,7 @@ public class AnalyzerContext {
             return streamProcessorMap.get(id);
         }
         StreamProcessor streamProcessor = new StreamProcessor();
-        streamProcessor.initConfig(pullProperties,analyzerProperties,pushProperties,iRedisAnalyzerResultService,encodingManager,dencodingManager);
+        streamProcessor.initConfig(pullProperties,analyzerProperties,pushProperties,iRedisAnalyzerResultService,kafkaSendService,encodingManager,dencodingManager);
         String rtmpPushUrl = "rtmp://"+DEFAULT_HOST+":"+DEFAULT_RTMP_PORT+"/"+APP+"/"+stream;
         String httpPushUrl = "http://"+DEFAULT_HOST+":"+DEFAULT_HTTP_PORT+"/"+APP+"/"+stream+".live.flv";
         streamProcessor.init(id,url,rtmpPushUrl,httpPushUrl);
@@ -72,22 +75,21 @@ public class AnalyzerContext {
     }
 
     public void executeStreamProcessor(Long id){
-        StreamProcessor streamProcessor = streamProcessorMap.get(id);
-        if(streamProcessor==null){
+        StreamProcessor oldstreamProcessor = streamProcessorMap.get(id);
+        if(oldstreamProcessor==null || oldstreamProcessor.isAlive()){
             return;
         }
-        if(streamProcessor.isAlive()){
-            return;
-        }
-        streamProcessor.start();
+        StreamProcessor newstreamProcessor = new StreamProcessor();
+        newstreamProcessor.initConfig(pullProperties,analyzerProperties,pushProperties,iRedisAnalyzerResultService,kafkaSendService,encodingManager,dencodingManager);
+        newstreamProcessor.init(id,oldstreamProcessor.getPullUrl(),oldstreamProcessor.getRtmpPushUrl(),oldstreamProcessor.httpPushUrl);
+        removeStreamProcessor(id);
+        newstreamProcessor.start();
+        streamProcessorMap.put(id, newstreamProcessor);
     }
 
     public void cancelStreamProcessor(Long id){
         StreamProcessor streamProcessor = streamProcessorMap.get(id);
-        if(streamProcessor==null){
-            return;
-        }
-        if(!streamProcessor.isAlive()){
+        if(streamProcessor==null || !streamProcessor.isAlive()){
             return;
         }
         streamProcessor.stop();

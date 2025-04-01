@@ -8,9 +8,11 @@ import com.saigou.thread.AnalyzerThread;
 import com.saigou.thread.EncodeThread;
 import com.saigou.thread.PullStreamThread;
 import com.saigou.thread.PushStreamThread;
-import com.saigou.util.RedisUtil;
+import com.saigou.util.KafkaSendService;
 import lombok.Getter;
 import org.bytedeco.javacv.Frame;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -18,6 +20,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 
 public class StreamProcessor {
+    private static final Logger log = LoggerFactory.getLogger(StreamProcessor.class);
     private LinkedBlockingQueue<Frame> pullframeQueue = new LinkedBlockingQueue<>(70);
     private LinkedBlockingQueue<ImageWrapper> imageQueue = new LinkedBlockingQueue<>(70);
     private LinkedBlockingQueue<Frame> pushFrameQueue = new LinkedBlockingQueue<>(70);
@@ -31,6 +34,7 @@ public class StreamProcessor {
     AnalyzerThread analyzerThread;
     PushStreamThread pushStreamThread;
     IRedisAnalyzerResultService iRedisAnalyzerResultService;
+    KafkaSendService kafkaSendService;
     ThreadPoolExecutor encodingManager;
     ThreadPoolExecutor dencodingManager;
     @Getter
@@ -47,11 +51,13 @@ public class StreamProcessor {
 
     public void initConfig(PullProperties pullProperties, AnalyzerProperties analyzerProperties,
                            PushProperties pushProperties, IRedisAnalyzerResultService iRedisAnalyzerResultService,
+                           KafkaSendService kafkaSendService,
                            ThreadPoolExecutor encodingManager,ThreadPoolExecutor dencodingManager) {
         this.pullProperties = pullProperties;
         this.analyzerProperties = analyzerProperties;
         this.pushProperties = pushProperties;
         this.iRedisAnalyzerResultService = iRedisAnalyzerResultService;
+        this.kafkaSendService = kafkaSendService;
         this.encodingManager = encodingManager;
         this.dencodingManager = dencodingManager;
     }
@@ -60,14 +66,16 @@ public class StreamProcessor {
         this.pullUrl = pullUrl;
         this.rtmpPushUrl = rtmpPushUrl;
         this.httpPushUrl = httpPushUrl;
-
     }
 
+
+
     public void start() {
-        this.pullStreamThread = new PullStreamThread(pullUrl,pullframeQueue,pullProperties);
-        this.encodeThread = new EncodeThread(pullframeQueue,imageQueue,pushFrameQueue,keyList,encodingManager);
-        this.analyzerThread = new AnalyzerThread(imageQueue,analyzerCache,analyzerProperties,iRedisAnalyzerResultService,controlId,dencodingManager);
-        this.pushStreamThread = new PushStreamThread(rtmpPushUrl, pullStreamThread.grabber,pushFrameQueue,analyzerCache,keyList,pushProperties);
+        pullStreamThread = new PullStreamThread(pullUrl,pullframeQueue,pullProperties);
+        encodeThread = new EncodeThread(pullframeQueue,imageQueue,pushFrameQueue,keyList,encodingManager);
+        encodeThread.setFrameRate((int) this.pullStreamThread.grabber.getFrameRate());
+        analyzerThread = new AnalyzerThread(imageQueue,analyzerCache,analyzerProperties,iRedisAnalyzerResultService,kafkaSendService,controlId,dencodingManager);
+        pushStreamThread = new PushStreamThread(rtmpPushUrl, pullStreamThread.grabber,pushFrameQueue,analyzerCache,keyList,pushProperties);
         pullStreamThread.start();
         encodeThread.start();
         analyzerThread.start();
@@ -76,11 +84,35 @@ public class StreamProcessor {
     }
 
     public void stop() {
-        pullStreamThread.interrupt();
-        encodeThread.interrupt();
-        analyzerThread.interrupt();
-        pushStreamThread.interrupt();
-        isAlive = false;
+        try{
+            pullStreamThread.interrupt();
+            encodeThread.interrupt();
+            analyzerThread.interrupt();
+            pushStreamThread.interrupt();
+            // 清空队列并关闭剩余帧
+            if(!pullframeQueue.isEmpty()){
+                pullframeQueue.forEach(Frame::close);
+                pullframeQueue.clear();
+            }
+            if(!pushFrameQueue.isEmpty()){
+                pushFrameQueue.forEach(Frame::close);
+                pushFrameQueue.clear();
+            }
+            if(!imageQueue.isEmpty()){
+                imageQueue.clear();
+            }
+            if(!keyList.isEmpty()){
+                keyList.clear();
+            }
+            if(!analyzerCache.isEmpty()){
+                analyzerCache.clear();
+            }
+            isAlive = false;
+        }catch (Exception e){
+            log.error("停止线程出错：{}", e);
+        }finally {
+            isAlive = false;
+        }
     }
 
 }

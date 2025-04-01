@@ -16,14 +16,16 @@ public class CodeGenerator {
     public static void main(String[] args) {
         List<String> tables = new ArrayList<>();
 //        tables.add("user");
-        tables.add("sclass");
-        tables.add("scourse");
-        tables.add("student");
-        tables.add("sclass_scourse");
-        tables.add("student_sclass");
+//        tables.add("sclass");
+//        tables.add("scourse");
+//        tables.add("student");
+//        tables.add("sclass_scourse");
+//        tables.add("student_sclass");
 //        tables.add("student");
 //        tables.add("sclass");
 //        tables.add("scourse");
+        tables.add("control_face");
+        tables.add("control_person");
 
 
         FastAutoGenerator.create("jdbc:p6spy:mysql://scnu.saigou.work:3306/scnu?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC&allowMultiQueries=true&allowPublicKeyRetrieval=true","scnu","Qq70852096..")

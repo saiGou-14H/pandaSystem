@@ -18,13 +18,13 @@ public class RedisDataPersistenceJob {
 
     @Scheduled(cron = "0/10 * * * * ?")
     public void doWork() {
-        System.out.println("---------------vo对象持久化-begin----------------");
-//        从redis中获取所有vo对象             keys strategy_statis_vo:*
-        List<ControlAnalyzerResult> vos = iRedisAnalyzerResultService.getAllResult();
-//        遍历vo对象,将数据更新到对应攻略表中
-//        for (List<AnalysisResult> vo : vos) {
-//            System.out.println("vo:" + vo);
-//        }
-        System.out.println("---------------vo对象持久化-end----------------");
+//        System.out.println("---------------vo对象持久化-begin----------------");
+////        从redis中获取所有vo对象             keys strategy_statis_vo:*
+//        List<ControlAnalyzerResult> vos = iRedisAnalyzerResultService.getAllResult();
+////        遍历vo对象,将数据更新到对应攻略表中
+////        for (List<AnalysisResult> vo : vos) {
+////            System.out.println("vo:" + vo);
+////        }
+//        System.out.println("---------------vo对象持久化-end----------------");
     }
 }

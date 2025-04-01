@@ -5,17 +5,22 @@ import com.saigou.api.service.IRedisAnalyzerResultService;
 import com.saigou.draw.Draw;
 import com.saigou.entity.FrameWrapper;
 import com.saigou.entity.ImageWrapper;
+import com.saigou.entity.KafkaEntity;
 import com.saigou.grpc.*;
 import com.saigou.properties.AnalyzerProperties;
+import com.saigou.util.KafkaSendService;
 import com.saigou.util.ProtoBufUtil;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.OpenCVFrameConverter;
 import org.bytedeco.opencv.opencv_core.Mat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.util.List;
 import java.util.concurrent.*;
 
@@ -28,22 +33,21 @@ public class AnalyzerThread extends Thread implements StreamObserver<AnalysisRes
     public ManagedChannel channel;
     public VideoProcessorGrpc.VideoProcessorStub stub;
     public StreamObserver<VideoFrame> requestObserver;
-    public OpenCVFrameConverter.ToMat converter;
-    private AnalyzerProperties analyzerProperties;
-    private IRedisAnalyzerResultService iRedisAnalyzerResultService;
+    final AnalyzerProperties analyzerProperties;
+    final IRedisAnalyzerResultService iRedisAnalyzerResultService;
+    final KafkaSendService kafkaSendService;
     ThreadPoolExecutor dencodingManager;
-    private Long controlId;
-    public boolean isAlive = false;
+    final Long controlId;
 
     public AnalyzerThread(LinkedBlockingQueue<ImageWrapper> imageQueue,
                           ConcurrentSkipListMap<Long, FrameWrapper> resultCache,
-                          AnalyzerProperties analyzerProperties, IRedisAnalyzerResultService iRedisAnalyzerResultService
-            , Long controlId, ThreadPoolExecutor dencodingManager) {
+                          AnalyzerProperties analyzerProperties, IRedisAnalyzerResultService iRedisAnalyzerResultService,
+                          KafkaSendService kafkaSendService, Long controlId, ThreadPoolExecutor dencodingManager) {
         this.resultCache = resultCache;
         this.imageQueue = imageQueue;
-        converter = new OpenCVFrameConverter.ToMat();
         this.analyzerProperties = analyzerProperties;
         this.iRedisAnalyzerResultService = iRedisAnalyzerResultService;
+        this.kafkaSendService = kafkaSendService;
         this.controlId = controlId;
         this.dencodingManager = dencodingManager;
         init();
@@ -57,13 +61,13 @@ public class AnalyzerThread extends Thread implements StreamObserver<AnalysisRes
                 .enableRetry().maxRetryAttempts(5).build();
         stub = VideoProcessorGrpc.newStub(channel);
         requestObserver = stub.processFrame(this);
+        log.info("算法服务启动成功");
     }
 
     @Override
     public void run() {
-        isAlive = true;
-        try {
-            while (!isInterrupted()) {
+        while (!isInterrupted()) {
+            try {
                 ImageWrapper wrapper;
                 wrapper = imageQueue.poll(5, TimeUnit.MILLISECONDS);
                 Algorithm face = Algorithm.newBuilder().setName("face").setType(1).build();
@@ -79,12 +83,9 @@ public class AnalyzerThread extends Thread implements StreamObserver<AnalysisRes
                             .build();
                     requestObserver.onNext(videoFrame);
                 }
-
+            } catch (Exception e) {
+//                log.error("算法解析错误", e);
             }
-        } catch (Exception e) {
-//            log.error("算法解析错误", e);
-        } finally {
-            isAlive = false;
         }
     }
 
@@ -95,9 +96,10 @@ public class AnalyzerThread extends Thread implements StreamObserver<AnalysisRes
             try {
                 // jpeg解码
                 dencodingManager.submit(() -> {
-                    iRedisAnalyzerResultService.addAnalysisResult2Hash(controlId, analysisResult.getTimestamp(), ProtoBufUtil.copyProtoBeanToJavaBean(analysisResult,
-                            com.saigou.entity.AnalysisResult.class));
-
+                    com.saigou.entity.AnalysisResult javaBeanResult = ProtoBufUtil.copyProtoBeanToJavaBean(analysisResult,
+                            com.saigou.entity.AnalysisResult.class);
+                    iRedisAnalyzerResultService.addAnalysisResult2Hash(controlId, analysisResult.getTimestamp(), javaBeanResult);
+                    kafkaSendService.send(new KafkaEntity(controlId, javaBeanResult));
                     Mat mat = dencodeJpeg(imageData);//释放该资源会导致帧顺序错误
                     List<FaceBox> faceBoxes = null;
                     List<PersonBox> expressions = null;
@@ -115,14 +117,15 @@ public class AnalyzerThread extends Thread implements StreamObserver<AnalysisRes
                             Draw.drawPersonPose(mat, points);
                         }
                     }
-                    Frame frame = converter.convert(mat);
-                    frame.timestamp = analysisResult.getTimestamp();
-                    FrameWrapper frameWrapper = new FrameWrapper(frame, faceBoxes, expressions);
-                    resultCache.put(frame.timestamp, frameWrapper);
+                    try(OpenCVFrameConverter.ToMat converter = new OpenCVFrameConverter.ToMat()){
+                        Frame frame = converter.convert(mat);
+                        frame.timestamp = analysisResult.getTimestamp();
+                        FrameWrapper frameWrapper = new FrameWrapper(frame, faceBoxes, expressions);
+                        resultCache.put(frame.timestamp, frameWrapper);
+                    }
                 });
             } catch (Exception e) {
-                System.out.println("处理图像时出错: " + e.getMessage());
-                throw new RuntimeException(e);
+                log.error("处理图像线程时出错: " + e);
             }
         }
     }
@@ -130,21 +133,41 @@ public class AnalyzerThread extends Thread implements StreamObserver<AnalysisRes
 
     @Override
     public void onError(Throwable throwable) {
-        System.err.println("gRPC 流错误: " + throwable.getMessage());
+        log.error("处理图像线程出错: " + throwable);
     }
 
     @Override
     public void onCompleted() {
-        System.out.println("处理图像完成");
+        log.info("处理图像线程结束");
     }
+    public void shutdown() {
+        // 1. 关闭请求流（如果是流式调用）
+        if (requestObserver != null) {
+            requestObserver.onCompleted(); // 通知服务器流结束
+        }
+
+        // 2. 关闭 Channel
+        if (channel != null && !channel.isShutdown()) {
+            channel.shutdown(); // 启动优雅关闭
+            try {
+                // 等待 1 秒让未完成请求处理
+                if (!channel.awaitTermination(500, TimeUnit.MILLISECONDS)) {
+                    channel.shutdownNow(); // 强制关闭
+                    channel.awaitTermination(500, TimeUnit.MILLISECONDS); // 再次等待
+                }
+            } catch (InterruptedException e) {
+                channel.shutdownNow(); // 强制关闭
+            }
+        }
+    }
+
 
     @Override
     public void interrupt() {
-        super.interrupt();
-        requestObserver.onCompleted();
-        channel.shutdown();
-        if (converter != null) {
-            converter.close();
+        if(!isInterrupted()){
+            super.interrupt();
         }
+        shutdown();
+        log.info("分析线程结束");
     }
 }

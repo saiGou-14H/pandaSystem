@@ -3,6 +3,7 @@ package com.saigou.thread;
 import com.saigou.properties.PullProperties;
 import com.saigou.util.Utils;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.SneakyThrows;
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.Frame;
@@ -13,11 +14,13 @@ import org.slf4j.LoggerFactory;
 import java.time.LocalDateTime;
 import java.util.concurrent.LinkedBlockingQueue;
 
+@EqualsAndHashCode(callSuper = true)
+@Data
 public class PullStreamThread extends Thread {
     private static final Logger log = LoggerFactory.getLogger(PullStreamThread.class);
     public FFmpegFrameGrabber grabber;
     public LinkedBlockingQueue<Frame> frameQueue;
-    public boolean isAlive = false;
+
     @SneakyThrows
     public PullStreamThread(String url,
                             LinkedBlockingQueue<Frame> frameQueue,
@@ -31,12 +34,12 @@ public class PullStreamThread extends Thread {
         grabber.setOption("rtsp_transport", pullProperties.getRtsp_transport());
         grabber.start();
     }
+
     @SneakyThrows
     public void run() {
-        isAlive = true;
         Frame frame;
-        try{
-            while (!isInterrupted() && (frame = grabber.grab()) != null) {
+        while (!isInterrupted() && (frame = grabber.grab()) != null) {
+            try {
                 if (frame.image != null) {
                     frame.timestamp = System.currentTimeMillis();
                     Frame clonedFrame = Utils.createDeepCopy(frame);
@@ -48,17 +51,18 @@ public class PullStreamThread extends Thread {
                         frameQueue.offer(clonedFrame);
                     }
                 }
-            }
-        }catch (Exception e){
+            } catch (Exception e) {
 //            log.error("拉流线程异常",e);
-        }finally {
-            isAlive = false;
+            } finally {
+            }
         }
     }
 
     @Override
     public void interrupt() {
-        super.interrupt();
+        if(!isInterrupted()){
+            super.interrupt();
+        }
         try {
             if (grabber != null) {
                 grabber.stop();
@@ -66,11 +70,9 @@ public class PullStreamThread extends Thread {
                 grabber.close();
             }
         } catch (FrameGrabber.Exception e) {
-            System.out.println("停止抓取器出错：" + e.getMessage());
+            log.error("停止抓取器出错：{}", e);
         }
-        // 清空队列并关闭剩余帧
-        frameQueue.forEach(Frame::close);
-        frameQueue.clear();
-        System.out.println("拉流线程终止");
+
+        log.info("拉流结束，时间：{}", LocalDateTime.now());
     }
 }

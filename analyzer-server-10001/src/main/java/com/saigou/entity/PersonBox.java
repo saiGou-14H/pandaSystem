@@ -10,6 +10,6 @@ public class PersonBox {
     private float score;
     private long trackId;
     private long attitudeId;
-    private String expressionFeature;
+    private String attitudeFeature;
     private String data;
 }

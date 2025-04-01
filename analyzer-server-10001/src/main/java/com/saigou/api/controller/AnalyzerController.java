@@ -1,6 +1,11 @@
 package com.saigou.api.controller;
 
+import cn.hutool.json.JSONUtil;
 import com.saigou.api.service.IAnalyzerService;
+import com.saigou.api.service.IMysqlAnalyzerService;
+import com.saigou.api.service.IRedisAnalyzerResultService;
+import com.saigou.entity.AnalysisResult;
+import com.saigou.entity.ControlAnalyzerResult;
 import com.saigou.entity.StreamProcessor;
 import com.saigou.util.KafkaSendService;
 import com.saigou.vo.StreamProcessorVO;
@@ -9,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +26,7 @@ import java.util.stream.Collectors;
 public class AnalyzerController {
     private static final Logger log = LoggerFactory.getLogger(AnalyzerController.class);
     private final IAnalyzerService analyzerService;
+    private final IMysqlAnalyzerService iMysqlAnalyzerService;
     @GetMapping("/create")
     public StreamProcessorVO create(@RequestParam("id") Long id, @RequestParam("url") String url, @RequestParam("stream") String stream) {
         StreamProcessor streamProcessor = analyzerService.create(id, url,stream);
@@ -29,7 +36,9 @@ public class AnalyzerController {
     }
 
     @GetMapping("/remove/{id}")
+    @Transactional
     public void remove(@PathVariable("id") Long id) {
+        iMysqlAnalyzerService.removeAnalysisResult(id);
         analyzerService.remove(id);
     }
 
@@ -62,9 +71,13 @@ public class AnalyzerController {
 
     @Autowired
     private KafkaSendService kafkaSendService;
+    private final IRedisAnalyzerResultService iRedisAnalyzerResultService;
     @GetMapping("/send")
     public void send() {
-        kafkaSendService.send("hello");
+        log.info("发送kafka消息");
+        ControlAnalyzerResult controlAnalyzerResult = iRedisAnalyzerResultService.getAllResult().get(0);
+        AnalysisResult analysisResult = controlAnalyzerResult.getResult().get(0);
+        kafkaSendService.send(analysisResult);
     }
 
 }

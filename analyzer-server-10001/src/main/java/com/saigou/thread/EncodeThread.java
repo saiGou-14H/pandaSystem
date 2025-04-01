@@ -2,6 +2,8 @@ package com.saigou.thread;
 
 import com.google.protobuf.ByteString;
 import com.saigou.entity.ImageWrapper;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.bytedeco.javacpp.BytePointer;
 import org.bytedeco.javacpp.IntPointer;
 import org.bytedeco.javacv.Frame;
@@ -15,17 +17,19 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.*;
 
-public class EncodeThread extends Thread{
+@EqualsAndHashCode(callSuper = true)
+@Data
+public class EncodeThread extends Thread {
     private static final Logger log = LoggerFactory.getLogger(EncodeThread.class);
     public LinkedBlockingQueue<Frame> frameQueue;
     public LinkedBlockingQueue<ImageWrapper> imageQueue;
     public CopyOnWriteArrayList<Long> keyList;
     public LinkedBlockingQueue<Frame> pushFrameQueue;
     public ThreadPoolExecutor encodingManager;
-    public boolean isAlive = false;
     private static final IntPointer jpegParams = new IntPointer(
             opencv_imgcodecs.IMWRITE_JPEG_QUALITY, 80//压缩率80%
     );
+
     public static Mat dencodeJpeg(ByteString data) {
         try (Mat inputMat = new Mat(data.toByteArray());
              Mat decodedMat = opencv_imgcodecs.
@@ -33,6 +37,7 @@ public class EncodeThread extends Thread{
             return decodedMat.clone(); // 返回独立副本
         }
     }
+
     public static ByteString encodeJpeg(Mat mat) {
         try (BytePointer buffer = new BytePointer()) {
             if (!opencv_imgcodecs.
@@ -42,6 +47,7 @@ public class EncodeThread extends Thread{
             return ByteString.copyFrom(buffer.getStringBytes());
         }
     }
+
     public EncodeThread(LinkedBlockingQueue<Frame> frameQueue, LinkedBlockingQueue<ImageWrapper> imageQueue,
                         LinkedBlockingQueue<Frame> pushFrameQueue, CopyOnWriteArrayList<Long> keyList,
                         ThreadPoolExecutor encodingManager) {
@@ -51,8 +57,10 @@ public class EncodeThread extends Thread{
         this.keyList = keyList;
         this.encodingManager = encodingManager;
     }
-    int count = 15;
+
+    int frameRate = 60;
     int frameCount = 0;
+
     private void handleFrame(Frame frame) {
         try (OpenCVFrameConverter.ToMat converter = new OpenCVFrameConverter.ToMat();
              Mat mat = converter.convert(frame);// 缩放图像
@@ -71,17 +79,17 @@ public class EncodeThread extends Thread{
             }
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("帧处理失败"+e.getMessage());
+            System.out.println("帧处理失败" + e.getMessage());
         }
     }
+
     @Override
     public void run() {
-        isAlive = true;
-        try{
-            while (!isInterrupted()){
+        while (!isInterrupted()) {
+            try {
                 Frame frame = frameQueue.poll(5, TimeUnit.MILLISECONDS);
                 if (frame != null && frame.image != null) {
-                    if(frameCount%count==0){
+                    if (frameCount % frameRate == 0) {
                         encodingManager.submit(() -> {
                             handleFrame(frame);
                         });
@@ -89,15 +97,18 @@ public class EncodeThread extends Thread{
                     pushFrameQueue.offer(frame);
                     frameCount++;
                 }
-            }
-        }catch (Exception e){
+            } catch (Exception e) {
 //            log.error("编码线程异常",e);
-        }finally {
-            isAlive = false;
+            } finally {
+            }
         }
     }
+
     @Override
     public void interrupt() {
-        super.interrupt();
+        if(!isInterrupted()){
+            super.interrupt();
+        }
+        log.info("编码线程结束");
     }
 }
