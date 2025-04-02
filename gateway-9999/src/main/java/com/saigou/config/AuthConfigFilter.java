@@ -30,20 +30,22 @@ public class AuthConfigFilter implements GlobalFilter , Ordered {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
-        if (isExclude(request.getURI().getPath())){
-            return chain.filter(exchange);
-        }
         if (request.getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
             String token = jwtUtil.getHeaderToken(request);
             if (token != null) {
-                if (jwtUtil.verifyToken(token) && JWTUtil.parseToken(token).getPayloads().containsKey("id") ) {
+                if (jwtUtil.verifyToken(token) && JWTUtil.parseToken(token).getPayloads().containsKey("id")) {
                     log.info("token验证成功");
                     log.info("userId:" + jwtUtil.getUserId(token));
                     ServerHttpRequest newRequest = request.mutate().header("userId", jwtUtil.getUserId(token).toString()).build();
                     exchange.mutate().request(newRequest).build();
                     return chain.filter(exchange);
+                }else if(jwtUtil.verifyToken(token)){
+                    log.info(String.valueOf(JWTUtil.parseToken(token).getPayloads()));
                 }
             }
+        }
+        if (isExclude(request.getURI().getPath())){
+            return chain.filter(exchange);
         }
         log.info("token验证失败");
         ServerHttpResponse response = exchange.getResponse();

@@ -6,10 +6,13 @@ import com.saigou.util.*;
 import com.saigou.vo.UserVo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     private final UserApi userApi;
     private final JwtUtil jwtUtil;
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisUtil redisUtil;
     @PostMapping("login")
     @Operation(summary = "登录",description = "根据账号密码登录")
     public ResponseVO login(@RequestBody User user){
@@ -34,7 +37,7 @@ public class AuthController {
         userVo.setAccessToken(jwtUtil.getAccessToken(auth.getId()));
         userVo.setRefreshToken(jwtUtil.getRefreshToken(auth.getId()));
         //Redis保存token
-        redisTemplate.opsForValue().set("user:"+auth.getId(),userVo.getRefreshToken(),60*60*1);
+        redisUtil.set("user:"+auth.getId(),userVo.getRefreshToken(),60*60*1);
         return ResponseVO.success(userVo);
     }
     @GetMapping("refresh")
@@ -51,7 +54,7 @@ public class AuthController {
     public ResponseVO logout(){
         Long userId = AuthContext.getId();
         //Redis删除登录信息
-        redisTemplate.delete("user:"+userId);
+        redisUtil.del("user:"+userId);
         return ResponseVO.success();
     }
 }

@@ -49,13 +49,11 @@ public class CourseController {
     @Operation(summary = "查询",description = "查询所有课程")
     public ResponseVO getAll()
     {
-        System.out.println(courseApi.getAll());
         return ResponseVO.success(courseApi.getAll());
     }
     @GetMapping("list")
     @Operation(summary = "查询",description = "查询班级所有课程")
     public ResponseVO getListByStudent() {
-
         return ResponseVO.success(courseApi.getAll());
     }
 

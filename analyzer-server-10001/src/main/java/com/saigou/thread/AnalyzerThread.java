@@ -133,7 +133,7 @@ public class AnalyzerThread extends Thread implements StreamObserver<AnalysisRes
 
     @Override
     public void onError(Throwable throwable) {
-        log.error("处理图像线程出错: " + throwable);
+        log.warn("处理图像线程: " + throwable);
     }
 
     @Override

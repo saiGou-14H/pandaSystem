@@ -50,7 +50,7 @@ public class RoomController {
     @PutMapping("update")
     @Operation(summary = "修改",description = "修改教室信息")
     public ResponseVO update(@RequestBody Room room) {
-        System.out.println(room);
+        log.info("修改教室信息:"+room);
         return ResponseVO.success(roomApi.update(room));
     }
 
