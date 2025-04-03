@@ -15,11 +15,9 @@ public class AnalysisResult implements Serializable,Comparable<AnalysisResult> {
     private long timestamp;
     private List<FaceBox> faceBoxes;
     private List<PersonBox> personBoxes;
+    private ControlTimestamp controlTimestamp;
     private String data;
     private byte[] imageData;
-
-
-
 
     @Override
     public int compareTo(@NotNull AnalysisResult o) {

@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
@@ -17,6 +18,7 @@ public class KafkaSinkHandler {
     public void receive(Object message) {
         KafkaEntity result = JSONUtil.toBean(message.toString(), KafkaEntity.class);
         iMysqlAnalyzerService.addAnalysisResult(result.getControlId(), result.getResult());
+
     }
 
 }

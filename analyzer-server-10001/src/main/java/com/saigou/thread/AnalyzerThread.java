@@ -1,5 +1,6 @@
 package com.saigou.thread;
 
+import cn.hutool.json.JSONUtil;
 import com.google.protobuf.ByteString;
 import com.saigou.api.service.IRedisAnalyzerResultService;
 import com.saigou.draw.Draw;
@@ -8,6 +9,7 @@ import com.saigou.entity.ImageWrapper;
 import com.saigou.entity.KafkaEntity;
 import com.saigou.grpc.*;
 import com.saigou.properties.AnalyzerProperties;
+import com.saigou.util.ClassroomAnalyzer;
 import com.saigou.util.KafkaSendService;
 import com.saigou.util.ProtoBufUtil;
 import io.grpc.ManagedChannel;
@@ -98,6 +100,7 @@ public class AnalyzerThread extends Thread implements StreamObserver<AnalysisRes
                 dencodingManager.submit(() -> {
                     com.saigou.entity.AnalysisResult javaBeanResult = ProtoBufUtil.copyProtoBeanToJavaBean(analysisResult,
                             com.saigou.entity.AnalysisResult.class);
+                    javaBeanResult.setControlTimestamp(ClassroomAnalyzer.analyze(controlId,javaBeanResult));
                     iRedisAnalyzerResultService.addAnalysisResult2Hash(controlId, analysisResult.getTimestamp(), javaBeanResult);
                     kafkaSendService.send(new KafkaEntity(controlId, javaBeanResult));
                     Mat mat = dencodeJpeg(imageData);//释放该资源会导致帧顺序错误

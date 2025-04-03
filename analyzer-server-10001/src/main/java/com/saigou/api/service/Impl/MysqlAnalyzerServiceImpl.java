@@ -19,8 +19,10 @@ public class MysqlAnalyzerServiceImpl implements IMysqlAnalyzerService {
     private static final Logger log = LoggerFactory.getLogger(MysqlAnalyzerServiceImpl.class);
     private final FaceBoxServiceImpl faceBoxService;
     private final PersonBoxServiceImpl personBoxService;
+    private final ControlTimestampServiceImpl controlTimestampService;
 
     @Override
+    @Transactional
     public void addAnalysisResult(Long controlId,AnalysisResult result) {
         Long timestamp = result.getTimestamp();
         List<FaceBox> faceBoxes = result.getFaceBoxes();
@@ -29,6 +31,7 @@ public class MysqlAnalyzerServiceImpl implements IMysqlAnalyzerService {
         List<ControlPerson> collect1 = personBoxes.stream().map(personBox -> Utils.PersonBox2ControlPerson(controlId, timestamp, personBox)).toList();
         faceBoxService.saveBatch(collect);
         personBoxService.saveBatch(collect1);
+        controlTimestampService.save(result.getControlTimestamp());
         log.info("addAnalysisResult完成");
     }
 
@@ -37,6 +40,7 @@ public class MysqlAnalyzerServiceImpl implements IMysqlAnalyzerService {
     public void removeAnalysisResult(Long controlId, Long timestamp) {
         faceBoxService.removeBatchByIds(faceBoxService.list(new QueryWrapper<ControlFace>().eq("control_id", controlId).eq("timestamp", timestamp)));
         personBoxService.removeBatchByIds(personBoxService.list(new QueryWrapper<ControlPerson>().eq("control_id", controlId).eq("timestamp", timestamp)));
+        controlTimestampService.remove(new QueryWrapper<ControlTimestamp>().eq("control_id", controlId).eq("timestamp", timestamp));
     }
 
     @Override
@@ -44,6 +48,7 @@ public class MysqlAnalyzerServiceImpl implements IMysqlAnalyzerService {
     public void removeAnalysisResult(Long controlId) {
         faceBoxService.removeBatchByIds(faceBoxService.list(new QueryWrapper<ControlFace>().eq("control_id", controlId)));
         personBoxService.removeBatchByIds(personBoxService.list(new QueryWrapper<ControlPerson>().eq("control_id", controlId)));
+        controlTimestampService.remove(new QueryWrapper<ControlTimestamp>().eq("control_id", controlId));
 
     }
 
@@ -60,6 +65,7 @@ public class MysqlAnalyzerServiceImpl implements IMysqlAnalyzerService {
             result.setTimestamp(timestamp);
             result.setFaceBoxes(ls.stream().map(Utils::ControlFace2FaceBox).collect(Collectors.toList()));
             result.setPersonBoxes(ls2.stream().map(Utils::ControlPerson2PersonBox).collect(Collectors.toList()));
+            result.setControlTimestamp(controlTimestampService.getOne(new QueryWrapper<ControlTimestamp>().eq("control_id", controlId).eq("timestamp", timestamp)));
             return result;
         }
         return null;
@@ -82,6 +88,7 @@ public class MysqlAnalyzerServiceImpl implements IMysqlAnalyzerService {
                         map(Utils::ControlFace2FaceBox).collect(Collectors.toList()));
                 result.setPersonBoxes(ls2.stream().filter(l -> Objects.equals(l.getTimestamp(), timestamp)).
                         map(Utils::ControlPerson2PersonBox).collect(Collectors.toList()));
+                result.setControlTimestamp(controlTimestampService.getOne(new QueryWrapper<ControlTimestamp>().eq("control_id", controlId).eq("timestamp", timestamp)));
                 results.add(result);
             });
             results.sort(Comparator.comparing(AnalysisResult::getTimestamp));
@@ -105,6 +112,7 @@ public class MysqlAnalyzerServiceImpl implements IMysqlAnalyzerService {
                         map(Utils::ControlFace2FaceBox).collect(Collectors.toList()));
                 result.setPersonBoxes(ls2.stream().filter(l -> Objects.equals(l.getTimestamp(), timestamp)).
                         map(Utils::ControlPerson2PersonBox).collect(Collectors.toList()));
+                result.setControlTimestamp(controlTimestampService.getOne(new QueryWrapper<ControlTimestamp>().eq("control_id", controlId).eq("timestamp", timestamp)));
                 results.add(result);
             });
             results.sort(Comparator.comparing(AnalysisResult::getTimestamp));
@@ -136,6 +144,7 @@ public class MysqlAnalyzerServiceImpl implements IMysqlAnalyzerService {
                             o.setTimestamp(timestamp);
                             o.setPersonBoxes(list2.stream().filter(l -> Objects.equals(l.getTimestamp(), timestamp)).map(Utils::ControlPerson2PersonBox).toList());
                             o.setFaceBoxes(list.stream().filter(l -> Objects.equals(l.getTimestamp(), timestamp)).map(Utils::ControlFace2FaceBox).toList());
+                            o.setControlTimestamp(controlTimestampService.getOne(new QueryWrapper<ControlTimestamp>().eq("control_id", result.getControlId()).eq("timestamp", timestamp)));
                             results.add(o);
                         }
                 );
