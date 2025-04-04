@@ -1,4 +1,4 @@
-package com.saigou.util;
+package com.saigou.config;
 
 import com.baomidou.mybatisplus.extension.handlers.AbstractJsonTypeHandler;
 import com.fasterxml.jackson.core.JsonProcessingException;

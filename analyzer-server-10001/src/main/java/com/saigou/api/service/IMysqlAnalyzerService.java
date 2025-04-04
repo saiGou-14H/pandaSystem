@@ -13,4 +13,5 @@ public interface IMysqlAnalyzerService {
     ControlAnalyzerResult getAnalysisResult(Long controlId, Long start_timestamp, Long end_timestamp);
     ControlAnalyzerResult getAnalysisResult(Long controlId);
     List<ControlAnalyzerResult> getAnalysisResult();
+    List<ControlAnalyzerResult> getAnalysisResult(Long controlId, Integer minutes);
 }

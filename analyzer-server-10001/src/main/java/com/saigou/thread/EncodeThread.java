@@ -58,7 +58,7 @@ public class EncodeThread extends Thread {
         this.encodingManager = encodingManager;
     }
 
-    int frameRate = 60;
+    int frameRate = 60;// 60帧进行一次算法分析
     int frameCount = 0;
 
     private void handleFrame(Frame frame) {

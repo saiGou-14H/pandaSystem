@@ -45,7 +45,6 @@ public class AnalyzerContext {
     private final AnalyzerProperties analyzerProperties;
     private final PushProperties pushProperties;
     private final Map<Long, StreamProcessor> streamProcessorMap = new HashMap<>();
-    private final IRedisAnalyzerResultService iRedisAnalyzerResultService;
     private final KafkaSendService kafkaSendService;
     private final ThreadPoolExecutor encodingManager = new ThreadPoolExecutor(17, 100,
             30, TimeUnit.SECONDS, new LinkedBlockingQueue<>(100), new ThreadPoolExecutor.DiscardOldestPolicy());
@@ -66,7 +65,7 @@ public class AnalyzerContext {
             return streamProcessorMap.get(id);
         }
         StreamProcessor streamProcessor = new StreamProcessor();
-        streamProcessor.initConfig(pullProperties,analyzerProperties,pushProperties,iRedisAnalyzerResultService,kafkaSendService,encodingManager,dencodingManager);
+        streamProcessor.initConfig(pullProperties,analyzerProperties,pushProperties,kafkaSendService,encodingManager,dencodingManager);
         String rtmpPushUrl = "rtmp://"+DEFAULT_HOST+":"+DEFAULT_RTMP_PORT+"/"+APP+"/"+stream;
         String httpPushUrl = "http://"+DEFAULT_HOST+":"+DEFAULT_HTTP_PORT+"/"+APP+"/"+stream+".live.flv";
         streamProcessor.init(id,url,rtmpPushUrl,httpPushUrl);
@@ -80,7 +79,7 @@ public class AnalyzerContext {
             return;
         }
         StreamProcessor newstreamProcessor = new StreamProcessor();
-        newstreamProcessor.initConfig(pullProperties,analyzerProperties,pushProperties,iRedisAnalyzerResultService,kafkaSendService,encodingManager,dencodingManager);
+        newstreamProcessor.initConfig(pullProperties,analyzerProperties,pushProperties,kafkaSendService,encodingManager,dencodingManager);
         newstreamProcessor.init(id,oldstreamProcessor.getPullUrl(),oldstreamProcessor.getRtmpPushUrl(),oldstreamProcessor.httpPushUrl);
         removeStreamProcessor(id);
         newstreamProcessor.start();

@@ -1,32 +1,30 @@
 package com.saigou.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-import com.saigou.util.MultilingualMapTypeHandler;
+import com.saigou.config.MultilingualMapTypeHandler;
 import io.swagger.annotations.ApiModel;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.Map;
 
 @Data
-@TableName("control_timestamp")
+@TableName(value = "control_timestamp",autoResultMap = true) // autoResultMap设置为true,否则获取json无法自动转成Map类型，则返回为null
 @ApiModel(value = "ControlTimestamp对象", description = "")
-@NoArgsConstructor
-@AllArgsConstructor
 public class ControlTimestamp implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     @TableId(value = "id", type = IdType.ASSIGN_ID)
-    private long id;
+    private Long id;
 
     @TableField("control_id")
-    private long controlId;
+    private Long controlId;
 
     @TableField("timestamp")
-    private long timestamp;
+    private Long timestamp;
 
     @TableField("total_score")
-    private double totalScore;
+    private Float totalScore;
 
     @TableField("status")
     private String status;

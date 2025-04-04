@@ -15,7 +15,7 @@ import java.util.Map;
 
 @RequiredArgsConstructor
 @RestController("result")
-@Tag(name = "redis-analyzer-result")
+@Tag(name = "/analyzer/redis")
 public class RedisAnalyzerResultController {
     private final IRedisAnalyzerResultService iRedisAnalyzerResultService;
 

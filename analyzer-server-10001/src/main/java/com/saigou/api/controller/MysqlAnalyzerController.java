@@ -13,7 +13,7 @@ import java.util.List;
 @RestController
 @RequestMapping("mysql")
 @RequiredArgsConstructor
-@Tag(name = "test_mysql")
+@Tag(name = "/analyzer/mysql")
 public class MysqlAnalyzerController {
     private final IMysqlAnalyzerService mysqlAnalyzerService;
 
@@ -58,6 +58,7 @@ public class MysqlAnalyzerController {
     public void addAnalysisResult(@PathVariable("controlId")Long controlId,@RequestBody AnalysisResult result) {
         mysqlAnalyzerService.addAnalysisResult(controlId, result);
     }
+
 
 
 }

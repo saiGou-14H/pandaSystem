@@ -36,19 +36,17 @@ public class AnalyzerThread extends Thread implements StreamObserver<AnalysisRes
     public VideoProcessorGrpc.VideoProcessorStub stub;
     public StreamObserver<VideoFrame> requestObserver;
     final AnalyzerProperties analyzerProperties;
-    final IRedisAnalyzerResultService iRedisAnalyzerResultService;
     final KafkaSendService kafkaSendService;
     ThreadPoolExecutor dencodingManager;
     final Long controlId;
 
     public AnalyzerThread(LinkedBlockingQueue<ImageWrapper> imageQueue,
                           ConcurrentSkipListMap<Long, FrameWrapper> resultCache,
-                          AnalyzerProperties analyzerProperties, IRedisAnalyzerResultService iRedisAnalyzerResultService,
-                          KafkaSendService kafkaSendService, Long controlId, ThreadPoolExecutor dencodingManager) {
+                          AnalyzerProperties analyzerProperties,KafkaSendService kafkaSendService
+            , Long controlId, ThreadPoolExecutor dencodingManager) {
         this.resultCache = resultCache;
         this.imageQueue = imageQueue;
         this.analyzerProperties = analyzerProperties;
-        this.iRedisAnalyzerResultService = iRedisAnalyzerResultService;
         this.kafkaSendService = kafkaSendService;
         this.controlId = controlId;
         this.dencodingManager = dencodingManager;
@@ -101,7 +99,6 @@ public class AnalyzerThread extends Thread implements StreamObserver<AnalysisRes
                     com.saigou.entity.AnalysisResult javaBeanResult = ProtoBufUtil.copyProtoBeanToJavaBean(analysisResult,
                             com.saigou.entity.AnalysisResult.class);
                     javaBeanResult.setControlTimestamp(ClassroomAnalyzer.analyze(controlId,javaBeanResult));
-                    iRedisAnalyzerResultService.addAnalysisResult2Hash(controlId, analysisResult.getTimestamp(), javaBeanResult);
                     kafkaSendService.send(new KafkaEntity(controlId, javaBeanResult));
                     Mat mat = dencodeJpeg(imageData);//释放该资源会导致帧顺序错误
                     List<FaceBox> faceBoxes = null;

@@ -33,7 +33,7 @@ public class StreamProcessor {
     EncodeThread encodeThread;
     AnalyzerThread analyzerThread;
     PushStreamThread pushStreamThread;
-    IRedisAnalyzerResultService iRedisAnalyzerResultService;
+
     KafkaSendService kafkaSendService;
     ThreadPoolExecutor encodingManager;
     ThreadPoolExecutor dencodingManager;
@@ -50,13 +50,11 @@ public class StreamProcessor {
 
 
     public void initConfig(PullProperties pullProperties, AnalyzerProperties analyzerProperties,
-                           PushProperties pushProperties, IRedisAnalyzerResultService iRedisAnalyzerResultService,
-                           KafkaSendService kafkaSendService,
+                           PushProperties pushProperties,KafkaSendService kafkaSendService,
                            ThreadPoolExecutor encodingManager,ThreadPoolExecutor dencodingManager) {
         this.pullProperties = pullProperties;
         this.analyzerProperties = analyzerProperties;
         this.pushProperties = pushProperties;
-        this.iRedisAnalyzerResultService = iRedisAnalyzerResultService;
         this.kafkaSendService = kafkaSendService;
         this.encodingManager = encodingManager;
         this.dencodingManager = dencodingManager;
@@ -73,8 +71,8 @@ public class StreamProcessor {
     public void start() {
         pullStreamThread = new PullStreamThread(pullUrl,pullframeQueue,pullProperties);
         encodeThread = new EncodeThread(pullframeQueue,imageQueue,pushFrameQueue,keyList,encodingManager);
-        encodeThread.setFrameRate((int) this.pullStreamThread.grabber.getFrameRate());
-        analyzerThread = new AnalyzerThread(imageQueue,analyzerCache,analyzerProperties,iRedisAnalyzerResultService,kafkaSendService,controlId,dencodingManager);
+        encodeThread.setFrameRate((int)(this.pullStreamThread.grabber.getFrameRate()*2));// 2秒进行一次算法分析
+        analyzerThread = new AnalyzerThread(imageQueue,analyzerCache,analyzerProperties,kafkaSendService,controlId,dencodingManager);
         pushStreamThread = new PushStreamThread(rtmpPushUrl, pullStreamThread.grabber,pushFrameQueue,analyzerCache,keyList,pushProperties);
         pullStreamThread.start();
         encodeThread.start();

@@ -107,6 +107,8 @@
             <artifactId>protobuf-java-util</artifactId>
             <version>3.25.3</version>
         </dependency>
+
+
     </dependencies>
 
     <build>

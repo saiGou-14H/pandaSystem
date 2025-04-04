@@ -17,20 +17,27 @@ public class ClassroomAnalyzer {
     );
 
     private static final Map<String, Double> EMOTION_WEIGHTS_ENGLISH = Map.of(
-            "happy", 0.9, "normal", 0.3, "surprise", 0.1,
+            "happy", 0.9, "normal", 0.3, "amaze", 0.1,
             "sad", -0.5, "angry", -0.8, "disgust", -0.7, "fear", -0.6
+    );
+
+    private static final Map<String, Double> POSTURE_WEIGHTS_CHINESE = Map.of(
+            "学习", 0.8, "举手", 0.6, "睡觉", -1.0
+    );
+    private static final Map<String, Double> POSTURE_WEIGHTS_ENGLISH = Map.of(
+            "study", 0.8, "hands", 0.6, "sleep", -1.0
     );
     // EMOTION_WEIGHTS_CHINESE + EMOTION_WEIGHTS_ENGLISH
     private static final Map<String, Double> EMOTION_WEIGHTS_ALL = new HashMap<>();
+
+    private static final Map<String, Double> POSTURE_WEIGHTS_ALL = new HashMap<>();
     static {
         EMOTION_WEIGHTS_ALL.putAll(EMOTION_WEIGHTS_CHINESE);
         EMOTION_WEIGHTS_ALL.putAll(EMOTION_WEIGHTS_ENGLISH);
+        POSTURE_WEIGHTS_ALL.putAll(POSTURE_WEIGHTS_CHINESE);
+        POSTURE_WEIGHTS_ALL.putAll(POSTURE_WEIGHTS_ENGLISH);
     }
 
-    private static final Map<String, Double> POSTURE_WEIGHTS = Map.of(
-            "学习", 0.8, "举手", 0.6, "睡觉", -1.0,
-            "study", 0.8, "hand", 0.6, "sleep", -1.0
-    );
 
     public static ControlTimestamp analyze(Long controlId,AnalysisResult result) {
         // 表情分析
@@ -43,22 +50,40 @@ public class ClassroomAnalyzer {
         // 姿态分析
         List<Double> postureScores = result.getPersonBoxes().stream()
                 .map(PersonBox::getAttitudeFeature)
-                .map(POSTURE_WEIGHTS::get)
+                .map(POSTURE_WEIGHTS_ALL::get)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
+        //中英转换
+        result.getFaceBoxes().forEach(fb -> {
+            if (fb.getExpressionFeature().equals("happy")) {
+                fb.setExpressionFeature("开心");
+            } else if (fb.getExpressionFeature().equals("normal")) {
+                fb.setExpressionFeature("正常");
+            } else if (fb.getExpressionFeature().equals("amaze")) {
+                fb.setExpressionFeature("惊讶");
+            } else if (fb.getExpressionFeature().equals("sad")) {
+                fb.setExpressionFeature("伤心");
+            } else if (fb.getExpressionFeature().equals("angry")) {
+                fb.setExpressionFeature("生气");
+            } else if (fb.getExpressionFeature().equals("disgust")) {
+                fb.setExpressionFeature("厌恶");
+            } else if (fb.getExpressionFeature().equals("fear")) {
+                fb.setExpressionFeature("恐惧");
+            }
+        });
 
         // 计算得分
-        double emotionAvg = emotionScores.isEmpty() ? 0 :
-                emotionScores.stream().mapToDouble(d -> d).average().orElse(0);
-        double postureAvg = postureScores.isEmpty() ? 0 :
-                postureScores.stream().mapToDouble(d -> d).average().orElse(0);
-        double totalScore = 0.6 * emotionAvg + 0.4 * postureAvg;
+        Float emotionAvg = emotionScores.isEmpty() ? 0 :
+                (float) emotionScores.stream().mapToDouble(d -> d).average().orElse(0);
+        Float postureAvg = postureScores.isEmpty() ? 0 :
+                (float) postureScores.stream().mapToDouble(d -> d).average().orElse(0);
+        Float totalScore = (float) (0.6 * emotionAvg + 0.4 * postureAvg);
         ControlTimestamp controlTimestamp = new ControlTimestamp();
         controlTimestamp.setControlId(controlId);
         controlTimestamp.setTimestamp(result.getTimestamp());
         controlTimestamp.setTotalScore(totalScore);
-        controlTimestamp.setEmotionDistribution(buildDistribution(emotionScores, EMOTION_WEIGHTS_ALL));
-        controlTimestamp.setPostureDistribution(buildDistribution(postureScores, POSTURE_WEIGHTS));
+        controlTimestamp.setEmotionDistribution(buildDistribution(emotionScores, EMOTION_WEIGHTS_CHINESE));
+        controlTimestamp.setPostureDistribution(buildDistribution(postureScores, POSTURE_WEIGHTS_CHINESE));
         controlTimestamp.setStatus(determineStatus(totalScore));
         controlTimestamp.setAlert(checkAlerts(emotionScores, postureScores));
         // 构建报告
@@ -114,7 +139,7 @@ public class ClassroomAnalyzer {
         List<PersonBox> personBoxes = new ArrayList<>();
         for (int i = 0; i < 10; i++){
             PersonBox personBox = new PersonBox();
-            personBox.setAttitudeFeature(POSTURE_WEIGHTS.keySet().toArray(new String[0])[i % POSTURE_WEIGHTS.size()]);
+            personBox.setAttitudeFeature(POSTURE_WEIGHTS_CHINESE.keySet().toArray(new String[0])[i % POSTURE_WEIGHTS_CHINESE.size()]);
             personBoxes.add(personBox);
         }
         input.setPersonBoxes(personBoxes);
