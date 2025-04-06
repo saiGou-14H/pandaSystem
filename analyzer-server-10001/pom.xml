@@ -56,7 +56,6 @@
             <artifactId>protobuf-java</artifactId>
             <version>4.28.0</version>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-websocket</artifactId>
@@ -83,15 +82,15 @@
                 <groupId>org.xolstice.maven.plugins</groupId>
                 <artifactId>protobuf-maven-plugin</artifactId>
                 <version>0.5.0</version>
-                <configuration>
-                    <protocArtifact>
-                        com.google.protobuf:protoc:4.28.0:exe:${os.detected.classifier}
-                    </protocArtifact>
-                    <pluginId>grpc-java</pluginId>
-                    <pluginArtifact>
-                        io.grpc:protoc-gen-grpc-java:1.66.0:exe:${os.detected.classifier}
-                    </pluginArtifact>
-                </configuration>
+<!--                <configuration>-->
+<!--                    <protocArtifact>-->
+<!--                        com.google.protobuf:protoc:4.28.0:exe:${os.detected.classifier}-->
+<!--                    </protocArtifact>-->
+<!--                    <pluginId>grpc-java</pluginId>-->
+<!--                    <pluginArtifact>-->
+<!--                        io.grpc:protoc-gen-grpc-java:1.66.0:exe:${os.detected.classifier}-->
+<!--                    </pluginArtifact>-->
+<!--                </configuration>-->
                 <executions>
                     <execution>
                         <goals>

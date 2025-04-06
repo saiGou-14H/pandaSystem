@@ -52,7 +52,6 @@ public class AnalyzerThread extends Thread implements StreamObserver<AnalysisRes
         this.dencodingManager = dencodingManager;
         init();
     }
-
     public void init() {
         channel = ManagedChannelBuilder.forAddress(analyzerProperties.getServer().get(0).getHost(),
                         analyzerProperties.getServer().get(0).getPort())
@@ -84,7 +83,7 @@ public class AnalyzerThread extends Thread implements StreamObserver<AnalysisRes
                     requestObserver.onNext(videoFrame);
                 }
             } catch (Exception e) {
-//                log.error("算法解析错误", e);
+                log.error("算法解析错误", e);
             }
         }
     }
@@ -93,10 +92,10 @@ public class AnalyzerThread extends Thread implements StreamObserver<AnalysisRes
     public void onNext(AnalysisResult analysisResult) {
         ByteString imageData = analysisResult.getImageData();
         if (imageData != null) {
-            try {
-                // jpeg解码
+            try {// jpeg解码
                 dencodingManager.submit(() -> {
-                    com.saigou.entity.AnalysisResult javaBeanResult = ProtoBufUtil.copyProtoBeanToJavaBean(analysisResult,
+                    com.saigou.entity.AnalysisResult javaBeanResult = ProtoBufUtil.copyProtoBeanToJavaBean(
+                            analysisResult,
                             com.saigou.entity.AnalysisResult.class);
                     javaBeanResult.setControlTimestamp(ClassroomAnalyzer.analyze(controlId,javaBeanResult));
                     kafkaSendService.send(new KafkaEntity(controlId, javaBeanResult));

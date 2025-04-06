@@ -1,9 +1,9 @@
 package com.saigou.api.controller;
 
 import com.saigou.api.service.IControlTimestampService;
-import com.saigou.entity.ControlTimestamp;
 import com.saigou.util.ResponseVO;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +15,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/analyzer/controltimestamp")
+@Tag(name = "controltimestamp")
 public class ControlTimestampController {
     private final IControlTimestampService controlTimestampService;
 

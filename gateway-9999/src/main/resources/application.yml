@@ -54,14 +54,14 @@ spring:
           uri: lb://analyzer-server-10001
           predicates:
             - Path=/analyzer/**
-        - id: ws-analyzer-server-10001
-          uri: lb:ws://analyzer-server-10001
-          predicates:
-            - Path=/ws/**
         - id: media-server-10000
           uri: lb://media-server-10000
           predicates:
             - Path=/media/**
+#        - id: analyzer-server-10001
+#          uri: lb:ws://analyzer-server-10001
+#          predicates:
+#            - Path=/ws/**
 auth:
   excludePaths:
     - /auth/**
@@ -75,8 +75,6 @@ auth:
     - /control-provider-9006/**
     - /analyzer-server-10001/**
     - /media-server-10000/**
-    - /ws/**
-
   jwt:
     secret: 70852096
 custom:

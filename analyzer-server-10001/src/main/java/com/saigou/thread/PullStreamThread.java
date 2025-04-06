@@ -22,9 +22,7 @@ public class PullStreamThread extends Thread {
     public LinkedBlockingQueue<Frame> frameQueue;
 
     @SneakyThrows
-    public PullStreamThread(String url,
-                            LinkedBlockingQueue<Frame> frameQueue,
-                            PullProperties pullProperties) {
+    public PullStreamThread(String url,LinkedBlockingQueue<Frame> frameQueue,PullProperties pullProperties){
         this.frameQueue = frameQueue;
         this.grabber = new FFmpegFrameGrabber(url);
         grabber.setImageHeight(pullProperties.getMaxImageHeight());
@@ -34,7 +32,6 @@ public class PullStreamThread extends Thread {
         grabber.setOption("rtsp_transport", pullProperties.getRtsp_transport());
         grabber.start();
     }
-
     @SneakyThrows
     public void run() {
         Frame frame;
@@ -52,8 +49,7 @@ public class PullStreamThread extends Thread {
                     }
                 }
             } catch (Exception e) {
-//            log.error("拉流线程异常",e);
-            } finally {
+            log.error("拉流线程异常",e);
             }
         }
     }

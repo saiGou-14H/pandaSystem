@@ -23,9 +23,7 @@ public class KafkaSinkHandler {
         KafkaEntity result = JSONUtil.toBean(message.toString(), KafkaEntity.class);
         iMysqlAnalyzerService.addAnalysisResult(result.getControlId(), result.getResult());
         iRedisAnalyzerResultService.addAnalysisResult2Hash(result.getControlId(), result.getResult().getTimestamp(), result.getResult());
-        result.getResult().setImageData(null); // 减少内存开销
+        result.getResult().setImageData(null); // 不传输Image，减少开销
         webSocketContext.sendMessageByControlId(result.getControlId(), JSONUtil.toJsonStr(result.getResult()));
-
     }
-
 }

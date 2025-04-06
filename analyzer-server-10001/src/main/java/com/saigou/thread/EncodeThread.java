@@ -29,7 +29,6 @@ public class EncodeThread extends Thread {
     private static final IntPointer jpegParams = new IntPointer(
             opencv_imgcodecs.IMWRITE_JPEG_QUALITY, 80//压缩率80%
     );
-
     public static Mat dencodeJpeg(ByteString data) {
         try (Mat inputMat = new Mat(data.toByteArray());
              Mat decodedMat = opencv_imgcodecs.
@@ -37,7 +36,6 @@ public class EncodeThread extends Thread {
             return decodedMat.clone(); // 返回独立副本
         }
     }
-
     public static ByteString encodeJpeg(Mat mat) {
         try (BytePointer buffer = new BytePointer()) {
             if (!opencv_imgcodecs.
@@ -73,8 +71,7 @@ public class EncodeThread extends Thread {
             if (imageQueue.remainingCapacity() > 10) { // 保持缓冲余量
                 imageQueue.offer(wrapper);
             } else {
-                // 丢弃旧帧保持实时性
-                imageQueue.poll();
+                imageQueue.poll(); // 丢弃旧帧保持实时性
                 imageQueue.offer(wrapper);
             }
         } catch (Exception e) {
@@ -82,7 +79,6 @@ public class EncodeThread extends Thread {
             System.out.println("帧处理失败" + e.getMessage());
         }
     }
-
     @Override
     public void run() {
         while (!isInterrupted()) {
@@ -98,8 +94,7 @@ public class EncodeThread extends Thread {
                     frameCount++;
                 }
             } catch (Exception e) {
-//            log.error("编码线程异常",e);
-            } finally {
+            log.error("编码线程异常",e);
             }
         }
     }
