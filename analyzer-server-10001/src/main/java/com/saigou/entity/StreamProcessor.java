@@ -46,7 +46,7 @@ public class StreamProcessor {
     @Getter
     public String httpPushUrl;
     @Getter
-    public boolean isAlive = false;
+    private volatile boolean running = false; // 新增运行状态标志
 
 
     public void initConfig(PullProperties pullProperties, AnalyzerProperties analyzerProperties,
@@ -78,7 +78,7 @@ public class StreamProcessor {
         encodeThread.start();
         analyzerThread.start();
         pushStreamThread.start();
-        isAlive = true;
+        running = true;
     }
 
     public void stop() {
@@ -105,11 +105,10 @@ public class StreamProcessor {
             if(!analyzerCache.isEmpty()){
                 analyzerCache.clear();
             }
-            isAlive = false;
         }catch (Exception e){
             log.error("停止线程出错：{}", e);
         }finally {
-            isAlive = false;
+            running = false;
         }
     }
 

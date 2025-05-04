@@ -75,12 +75,12 @@ public class AnalyzerContext {
 
     public void executeStreamProcessor(Long id){
         StreamProcessor oldstreamProcessor = streamProcessorMap.get(id);
-        if(oldstreamProcessor==null || oldstreamProcessor.isAlive()){
+        if(oldstreamProcessor==null || oldstreamProcessor.isRunning()){
             return;
         }
         StreamProcessor newstreamProcessor = new StreamProcessor();
         newstreamProcessor.initConfig(pullProperties,analyzerProperties,pushProperties,kafkaSendService,encodingManager,dencodingManager);
-        newstreamProcessor.init(id,oldstreamProcessor.getPullUrl(),oldstreamProcessor.getRtmpPushUrl(),oldstreamProcessor.httpPushUrl);
+        newstreamProcessor.init(id,oldstreamProcessor.getPullUrl(),oldstreamProcessor.getRtmpPushUrl(),oldstreamProcessor.getHttpPushUrl());
         removeStreamProcessor(id);
         newstreamProcessor.start();
         streamProcessorMap.put(id, newstreamProcessor);
@@ -88,7 +88,7 @@ public class AnalyzerContext {
 
     public void cancelStreamProcessor(Long id){
         StreamProcessor streamProcessor = streamProcessorMap.get(id);
-        if(streamProcessor==null || !streamProcessor.isAlive()){
+        if(streamProcessor==null || !streamProcessor.isRunning()){
             return;
         }
         streamProcessor.stop();
@@ -99,7 +99,7 @@ public class AnalyzerContext {
         if(streamProcessor==null){
             return;
         }
-        if(streamProcessor.isAlive()){
+        if(streamProcessor.isRunning()){
             streamProcessor.stop();
         }
         streamProcessorMap.remove(id);

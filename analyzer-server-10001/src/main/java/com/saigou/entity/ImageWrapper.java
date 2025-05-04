@@ -1,7 +1,9 @@
 package com.saigou.entity;
 
 import com.google.protobuf.ByteString;
+import lombok.Data;
 
+@Data
 public class ImageWrapper implements Comparable<ImageWrapper> {
     public final ByteString imageData;
     public final long timestamp;

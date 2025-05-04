@@ -2,9 +2,10 @@ package com.saigou.entity;
 
 import com.saigou.grpc.FaceBox;
 import com.saigou.grpc.PersonBox;
+import lombok.Data;
 import org.bytedeco.javacv.Frame;
 import java.util.List;
-
+@Data
 public class FrameWrapper {
     public final List<FaceBox> faceBoxes;
     public final List<PersonBox> PersonBoxs;

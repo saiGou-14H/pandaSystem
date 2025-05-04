@@ -78,7 +78,9 @@ public class Utils {
                             av_frame_free(avFrame);
                         } else if (opaque instanceof Mat) {
                             Mat mat = (Mat) opaque;
-                            mat.release(); // OpenCV Mat的内存释放方法
+                            if(!mat.isNull()){
+                                mat.release(); // OpenCV Mat的内存释放方法
+                            }
                         }
                     }
                 }

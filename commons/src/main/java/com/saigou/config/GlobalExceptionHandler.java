@@ -15,7 +15,7 @@ public class GlobalExceptionHandler {
 
 
     @ExceptionHandler(RuntimeException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)//500错误 openfegin调用自动事务回滚
     public ResponseVO exception(Exception e){
         log.error("运行时异常：----------------{}",e.getMessage());
         return ResponseVO.error(500,e.getMessage());
